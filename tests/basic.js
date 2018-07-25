@@ -14,11 +14,11 @@ tap.test('objects', function (childTest) {
 })
 
 tap.test('Bases', function (childTest) {
-  let input = nuon.parse(`{ a: 0xF, b: 0b1, c: 0o8, d: 10 }`)
+  let input = nuon.parse(`{ a: 0xF, b: 0b1, c: 0o7, d: 10 }`)
 
   childTest.strictSame(input.a, 0xF)
   childTest.strictSame(input.b, 0b1),
-  childTest.strictSame(input.c, 8),
+  childTest.strictSame(input.c, 7)
   childTest.strictSame(input.d, 10)
   childTest.end()
 })

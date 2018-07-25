@@ -5,6 +5,9 @@ const moo = require("moo");
 const lexer = moo.compile({
   WS:      /[ \t]+/,
   comment: /\/\/.*?$/,
+  hex: /0x[a-fA-F0-9]+/,
+  oct: /0o[0-7]+/,
+  bin: /0b[01]+/,
   identifier: /[a-zA-Z_][a-zA-Z0-9_]*/,
   number:  /[+-]?\d+(?:\.\d+)?/,
   string:  /"(?:\\["\\]|[^\n"\\])*?"|'(?:\\['\\]|[^\n'\\])*?'/,
@@ -87,21 +90,19 @@ function preprocessString(str) {
 
 # https://omrelli.ug/nearley-playground/
 MAIN -> _ VALUE _                           {% d => d[1] %}
-VARNAME -> [a-zA-Z0-9]:+                    {% d => d[0].join("") %}
-STR -> .:*                                  {% d => d[0].join("") %}
-NUM -> [0-9]:+                              {% d => d[0].join("") %}
-BINARY -> [01]:+                            {% d => d[0].join("") %}
+
+BIN -> [01]:+                            {% d => d[0].join("") %}
 HEX -> [0-9A-Fa-f]:+                        {% d => d[0].join("") %}
-OCTAL -> [0-7]:+                            {% d => d[0].join("") %}
+OCT -> [0-7]:+                            {% d => d[0].join("") %}
 
 # PRIMITIVE NUMBERS
-SIGN -> "+" | "-"                           {% d => d[0] %}
 BOOLEAN -> "true" | "false"                 {% d => d[0] == "true" ? true : false  %}
 NULL -> "null"                              {% d => null %}
 NAN -> "NaN"                                {% d => NaN %}
-HEXNUM -> "0x" HEX                          {% d => preprocessInt(d[1], 16) %}
-OCTNUM -> "0o" HEX                          {% d => preprocessInt(d[1], 8) %}
-BINNUM -> "0b" HEX                          {% d => preprocessInt(d[1], 2) %}
+
+HEXNUM -> %hex                              {% d => preprocessInt(d[0].value.substr(2), 16) %}
+OCTNUM -> %oct                              {% d => preprocessInt(d[0].value.substr(2), 8) %}
+BINNUM -> %bin                              {% d => preprocessInt(d[0].value.substr(2), 2) %}
 DECNUM -> %number                           {% d => preprocessFloat(d[0].value) %}
 
 # STRINGS
