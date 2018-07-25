@@ -29,6 +29,10 @@ if (typeof Map != undefined) {
   types['Map'] = Map
 }
 
+if (typeof Set != undefined) {
+  types['Set'] = Set
+}
+
 const funcs = {
   'Int': parseInt,
   'Float': parseFloat,
@@ -36,7 +40,7 @@ const funcs = {
 }
 
 function newInstance(name, args) {
-  // console.log(name, args)
+  console.log('newInstance', name, args)
   if (types[name]) {
     return new types[name](...args)
   }
@@ -92,7 +96,7 @@ OCTAL -> [0-7]:+                            {% d => d[0].join("") %}
 
 # PRIMITIVE NUMBERS
 SIGN -> "+" | "-"                           {% d => d[0] %}
-NUMBER -> %number                              {% d => preprocessFloat(d[0].value) %}
+NUMBER -> %number                           {% d => preprocessFloat(d[0].value) %}
 NUMBER -> "0b" BINARY                       {% d => preprocessInt(d[1], 2) %}
 NUMBER -> "0x" HEX                          {% d => preprocessInt(d[1], 16) %}
 NUMBER -> "0o" OCTAL                        {% d => preprocessInt(d[1], 8) %}
@@ -103,7 +107,7 @@ NULL -> "null"                              {% d => null %}
 STRING -> %string                           {% d => preprocessString(d[0].value) %}
 
 # KEY VALUE SEPARATED LIST
-KEYVALUE -> %identifier _ ":" _ VALUE           {% d => [ d[0].value, d[4] ] %}
+KEYVALUE -> %identifier _ ":" _ VALUE       {% d => [ d[0].value, d[4] ] %}
           | %string _ ":" _ VALUE           {% d => [ preprocessString(d[0].value), d[4] ] %}
 
 # COMMA SEPARATED KEY VALUE LIST
@@ -131,8 +135,8 @@ VALUE -> NUMBER                             {% d => { return d[0] } %}
     | CONS                                  {% d => { return d[0] } %}
     | BOOLEAN                               {% d => { return d[0] } %}
     | NULL                                  {% d => { return d[0] } %}
-CONS -> %identifier _ "(" _ ")"                 {% d => { return newInstance(d[0].value, []) } %}
-CONS -> %identifier _ "(" _ CSVALUE _ ")"       {% d => { return newInstance(d[0].value, d[4]) } %}
+CONS -> %identifier _ "(" _ ")"             {% d => { return newInstance(d[0].value, []) } %}
+CONS -> %identifier _ "(" _ CSVALUE _ ")"   {% d => { return newInstance(d[0].value, d[4]) } %}
 
 
 _ -> [\s]:*     {% function(d) {return null } %}

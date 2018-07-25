@@ -33,6 +33,10 @@ if (typeof Map != undefined) {
   types['Map'] = Map
 }
 
+if (typeof Set != undefined) {
+  types['Set'] = Set
+}
+
 const funcs = {
   'Int': parseInt,
   'Float': parseFloat,
