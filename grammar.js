@@ -44,7 +44,7 @@ const funcs = {
 }
 
 function newInstance(name, args) {
-  // console.log(name, args)
+  // console.log('newInstance', name, args)
   if (types[name]) {
     return new types[name](...args)
   }
@@ -109,13 +109,14 @@ var grammar = {
     {"name": "OCTAL", "symbols": ["OCTAL$ebnf$1"], "postprocess": d => d[0].join("")},
     {"name": "SIGN", "symbols": [{"literal":"+"}]},
     {"name": "SIGN", "symbols": [{"literal":"-"}], "postprocess": d => d[0]},
-    {"name": "NUMBER", "symbols": [(lexer.has("number") ? {type: "number"} : number)], "postprocess": d => preprocessFloat(d[0].value)},
-    {"name": "NUMBER", "symbols": [{"literal":"0b"}, "BINARY"], "postprocess": d => preprocessInt(d[1], 2)},
-    {"name": "NUMBER", "symbols": [{"literal":"0x"}, "HEX"], "postprocess": d => preprocessInt(d[1], 16)},
-    {"name": "NUMBER", "symbols": [{"literal":"0o"}, "OCTAL"], "postprocess": d => preprocessInt(d[1], 8)},
     {"name": "BOOLEAN", "symbols": [{"literal":"true"}]},
     {"name": "BOOLEAN", "symbols": [{"literal":"false"}], "postprocess": d => d[0] == "true" ? true : false},
     {"name": "NULL", "symbols": [{"literal":"null"}], "postprocess": d => null},
+    {"name": "NAN", "symbols": [{"literal":"NaN"}], "postprocess": d => NaN},
+    {"name": "HEXNUM", "symbols": [{"literal":"0x"}, "HEX"], "postprocess": d => preprocessInt(d[1], 16)},
+    {"name": "OCTNUM", "symbols": [{"literal":"0o"}, "HEX"], "postprocess": d => preprocessInt(d[1], 8)},
+    {"name": "BINNUM", "symbols": [{"literal":"0b"}, "HEX"], "postprocess": d => preprocessInt(d[1], 2)},
+    {"name": "DECNUM", "symbols": [(lexer.has("number") ? {type: "number"} : number)], "postprocess": d => preprocessFloat(d[0].value)},
     {"name": "STRING", "symbols": [(lexer.has("string") ? {type: "string"} : string)], "postprocess": d => preprocessString(d[0].value)},
     {"name": "KEYVALUE", "symbols": [(lexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":":"}, "_", "VALUE"], "postprocess": d => [ d[0].value, d[4] ]},
     {"name": "KEYVALUE", "symbols": [(lexer.has("string") ? {type: "string"} : string), "_", {"literal":":"}, "_", "VALUE"], "postprocess": d => [ preprocessString(d[0].value), d[4] ]},
@@ -127,13 +128,17 @@ var grammar = {
     {"name": "DICT", "symbols": [{"literal":"{"}, "_", {"literal":"}"}], "postprocess": d => { return {} }},
     {"name": "ARRAY", "symbols": [{"literal":"["}, "_", "CSVALUE", "_", {"literal":"]"}], "postprocess": d => d[2]},
     {"name": "ARRAY", "symbols": [{"literal":"["}, "_", {"literal":"]"}], "postprocess": d => { return [] }},
-    {"name": "VALUE", "symbols": ["NUMBER"], "postprocess": d => { return d[0] }},
     {"name": "VALUE", "symbols": ["STRING"], "postprocess": d => { return d[0] }},
     {"name": "VALUE", "symbols": ["DICT"], "postprocess": d => { return d[0] }},
     {"name": "VALUE", "symbols": ["ARRAY"], "postprocess": d => { return d[0] }},
     {"name": "VALUE", "symbols": ["CONS"], "postprocess": d => { return d[0] }},
     {"name": "VALUE", "symbols": ["BOOLEAN"], "postprocess": d => { return d[0] }},
     {"name": "VALUE", "symbols": ["NULL"], "postprocess": d => { return d[0] }},
+    {"name": "VALUE", "symbols": ["NAN"], "postprocess": d => { return d[0] }},
+    {"name": "VALUE", "symbols": ["BINNUM"], "postprocess": d => { return d[0] }},
+    {"name": "VALUE", "symbols": ["HEXNUM"], "postprocess": d => { return d[0] }},
+    {"name": "VALUE", "symbols": ["OCTNUM"], "postprocess": d => { return d[0] }},
+    {"name": "VALUE", "symbols": ["DECNUM"], "postprocess": d => { return d[0] }},
     {"name": "CONS", "symbols": [(lexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":"("}, "_", {"literal":")"}], "postprocess": d => { return newInstance(d[0].value, []) }},
     {"name": "CONS", "symbols": [(lexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":"("}, "_", "CSVALUE", "_", {"literal":")"}], "postprocess": d => { return newInstance(d[0].value, d[4]) }},
     {"name": "_$ebnf$1", "symbols": []},

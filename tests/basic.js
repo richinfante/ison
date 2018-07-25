@@ -13,6 +13,33 @@ tap.test('objects', function (childTest) {
   childTest.end()
 })
 
+tap.test('Bases', function (childTest) {
+  let input = nuon.parse(`{ a: 0xF, b: 0b1, c: 0o8, d: 10 }`)
+
+  childTest.strictSame(input.a, 0xF)
+  childTest.strictSame(input.b, 0b1),
+  childTest.strictSame(input.c, 8),
+  childTest.strictSame(input.d, 10)
+  childTest.end()
+})
+
+tap.test('null', function (childTest) {
+  let input = nuon.parse(`{ a: null }`)
+
+  childTest.strictSame(input.a, null)
+  childTest.end()
+})
+
+tap.test('NaN', function (childTest) {
+  const obj = { a: NaN, b: 2}
+  let input3 = nuon.parse(nuon.stringify(obj))
+
+  childTest.ok(isNaN(obj.a), 'check NaN is present')
+  childTest.strictSame(input3, obj, 'stringify-parse loop yields same object')
+  childTest.end()
+})
+
+
 tap.test('arrays', function (childTest) {
   const input = [ 1, 2, new Date(), { a: 1, b: 2 }, Object({ e: 1, f: 2 }), [[1], 2], 3]
 

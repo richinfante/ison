@@ -42,8 +42,8 @@ function stringify(object) {
         return `${item[0]}: ${stringify(item[1])}`
       }).join(', ')}})`
     }
-
-    
+  } else if (isNaN(object)) {
+    return 'NaN'
   } else if (typeof object == 'number') {
     // Number
     return `${object}`

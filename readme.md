@@ -2,13 +2,13 @@
 
 **DISCLAIMER: This package is experimental. Although it should be stable for most cases, you most likely shouldn't trust it yet for production use**
 
-UON is a more powerful cousin to JSON. It allows for serialization of dates, and other user types. It is technically a subset of Javascript, so it is theoretically possible to run directly in a Javascript interpreter.
+A better object notation with Date and custom types support, and JSON compatibility.
 
 ## Examples:
 
 NUON allows for dates, as well as a more relaxed syntax. we do not require keys to be quoted, as long as the conform to the regex `/[a-zA-Z_][_a-zA-Z0-9]*/`. Arbitrary keys must be quoted strings, but for a well designed schema this should not be required.
 
-Notation for custom objects uses a function-like syntax. Essentially, it mimics the object's constructor. The `new` is not allowed or required in NUON however, since it is a notation and not a scripting language.
+Notation for custom objects uses a function-like syntax. Essentially, it mimics the object's constructor. The `new` is required (or allowed) in NUON however, since it is a notation and not a scripting language. It is technically a subset of Javascript, however, so it is theoretically possible to run directly in a Javascript interpreter with the correct functions defined.
 
 ```js
 {

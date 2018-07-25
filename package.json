@@ -4,7 +4,7 @@
   "description": "A better object notation",
   "main": "index.js",
   "scripts": {
-    "test": "node tests/basic.js",
+    "test": "npm run build && node tests/basic.js",
     "build": "nearleyc grammar.ne -o grammar.js"
   },
   "author": "rich@richinfante.com",

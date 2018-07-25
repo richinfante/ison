@@ -40,7 +40,7 @@ const funcs = {
 }
 
 function newInstance(name, args) {
-  console.log('newInstance', name, args)
+  // console.log('newInstance', name, args)
   if (types[name]) {
     return new types[name](...args)
   }
@@ -96,12 +96,13 @@ OCTAL -> [0-7]:+                            {% d => d[0].join("") %}
 
 # PRIMITIVE NUMBERS
 SIGN -> "+" | "-"                           {% d => d[0] %}
-NUMBER -> %number                           {% d => preprocessFloat(d[0].value) %}
-NUMBER -> "0b" BINARY                       {% d => preprocessInt(d[1], 2) %}
-NUMBER -> "0x" HEX                          {% d => preprocessInt(d[1], 16) %}
-NUMBER -> "0o" OCTAL                        {% d => preprocessInt(d[1], 8) %}
 BOOLEAN -> "true" | "false"                 {% d => d[0] == "true" ? true : false  %}
 NULL -> "null"                              {% d => null %}
+NAN -> "NaN"                                {% d => NaN %}
+HEXNUM -> "0x" HEX                          {% d => preprocessInt(d[1], 16) %}
+OCTNUM -> "0o" HEX                          {% d => preprocessInt(d[1], 8) %}
+BINNUM -> "0b" HEX                          {% d => preprocessInt(d[1], 2) %}
+DECNUM -> %number                           {% d => preprocessFloat(d[0].value) %}
 
 # STRINGS
 STRING -> %string                           {% d => preprocessString(d[0].value) %}
@@ -128,13 +129,18 @@ ARRAY -> "[" _ "]"                          {% d => { return [] } %}
 
 
 # VALUE
-VALUE -> NUMBER                             {% d => { return d[0] } %}
-    | STRING                                {% d => { return d[0] } %}
+VALUE -> 
+     STRING                                 {% d => { return d[0] } %}
     | DICT                                  {% d => { return d[0] } %}
     | ARRAY                                 {% d => { return d[0] } %}
     | CONS                                  {% d => { return d[0] } %}
     | BOOLEAN                               {% d => { return d[0] } %}
     | NULL                                  {% d => { return d[0] } %}
+    | NAN                                   {% d => { return d[0] } %}
+    | BINNUM                                {% d => { return d[0] } %}
+    | HEXNUM                                {% d => { return d[0] } %}
+    | OCTNUM                                {% d => { return d[0] } %}
+    | DECNUM                                {% d => { return d[0] } %}
 CONS -> %identifier _ "(" _ ")"             {% d => { return newInstance(d[0].value, []) } %}
 CONS -> %identifier _ "(" _ CSVALUE _ ")"   {% d => { return newInstance(d[0].value, d[4]) } %}
 
