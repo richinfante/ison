@@ -1,0 +1,19 @@
+{
+  "name": "uon",
+  "version": "1.0.0",
+  "description": "A more descriptive object notation",
+  "main": "index.js",
+  "scripts": {
+    "test": "node tests/basic.js",
+    "build": "nearleyc grammar.ne -o grammar.js"
+  },
+  "author": "rich@richinfante.com",
+  "license": "MIT",
+  "dependencies": {
+    "moo": "^0.4.3",
+    "nearley": "^2.15.0"
+  },
+  "devDependencies": {
+    "tap": "^12.0.1"
+  }
+}
