@@ -34,3 +34,16 @@ tap.test('dates', function (childTest) {
   
   childTest.end()
 })
+
+
+tap.test('buffers', function (childTest) {
+  let input = uon.parse(`{
+    data: Buffer('deadbeef', 'hex'),
+    name: String(Buffer('hello, world!', 'ascii'))
+  }`)
+
+  childTest.strictSame(input.data, new Buffer('deadbeef', 'hex'))
+  childTest.strictSame(input.name, 'hello, world!')
+
+  childTest.end()
+})

@@ -11,7 +11,7 @@ const lexer = moo.compile({
   comment: /\/\/.*?$/,
   identifier: /[a-zA-Z_][a-zA-Z0-9_]*/,
   number:  /[+-]?\d+(?:\.\d+)?/,
-  string:  /"(?:\\["\\]|[^\n"\\])*?"/,
+  string:  /"(?:\\["\\]|[^\n"\\])*?"|'(?:\\['\\]|[^\n'\\])*?'/,
   separator: ':',
   comma: ',',
   brackets: /[\{\}\[\]\(\)]/,
@@ -22,8 +22,19 @@ const types = {
   'Date': Date,
   'Object': Object,
   'Array': Array,
-  'Number': Number,
-  'Buffer': Buffer
+  'Number': Number
+}
+
+if (typeof Buffer != undefined) {
+  types['Buffer'] = Buffer
+}
+
+if (typeof Symbol != undefined) {
+  types['Symbol'] = Symbol
+}
+
+if (typeof Map != undefined) {
+  types['Map'] = Map
 }
 
 const funcs = {
@@ -33,6 +44,7 @@ const funcs = {
 }
 
 function newInstance(name, args) {
+  // console.log(name, args)
   if (types[name]) {
     return new types[name](...args)
   }
@@ -69,7 +81,7 @@ function preprocessInt(str, radix) {
 
 function preprocessString(str) {
   // console.log('preprocess string', str)
-  let output = str.substring(1, str.length - 2)
+  let output = str.substring(1, str.length - 1)
   return output
 }
 

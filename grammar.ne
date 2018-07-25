@@ -7,7 +7,7 @@ const lexer = moo.compile({
   comment: /\/\/.*?$/,
   identifier: /[a-zA-Z_][a-zA-Z0-9_]*/,
   number:  /[+-]?\d+(?:\.\d+)?/,
-  string:  /"(?:\\["\\]|[^\n"\\])*?"/,
+  string:  /"(?:\\["\\]|[^\n"\\])*?"|'(?:\\['\\]|[^\n'\\])*?'/,
   separator: ':',
   comma: ',',
   brackets: /[\{\}\[\]\(\)]/,
@@ -40,6 +40,7 @@ const funcs = {
 }
 
 function newInstance(name, args) {
+  // console.log(name, args)
   if (types[name]) {
     return new types[name](...args)
   }
@@ -76,7 +77,7 @@ function preprocessInt(str, radix) {
 
 function preprocessString(str) {
   // console.log('preprocess string', str)
-  let output = str.substring(1, str.length - 2)
+  let output = str.substring(1, str.length - 1)
   return output
 }
 
