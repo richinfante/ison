@@ -1,5 +1,7 @@
 # UON
 
+**DISCLAIMER: This package is experimental. Although it should be stable for most cases, you most likely shouldn't trust it yet for production use**
+
 UON is a more powerful cousin to JSON. It allows for serialization of dates, and other user types. It is technically a subset of Javascript, so it is theoretically possible to run directly in a Javascript interpreter.
 
 ## Examples:

@@ -25,10 +25,6 @@ if (typeof Buffer != undefined) {
   types['Buffer'] = Buffer
 }
 
-if (typeof Symbol != undefined) {
-  types['Symbol'] = Symbol
-}
-
 if (typeof Map != undefined) {
   types['Map'] = Map
 }

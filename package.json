@@ -1,7 +1,7 @@
 {
   "name": "uon",
-  "version": "1.0.0",
-  "description": "A more descriptive object notation",
+  "version": "0.0.1",
+  "description": "A better object notation",
   "main": "index.js",
   "scripts": {
     "test": "node tests/basic.js",
