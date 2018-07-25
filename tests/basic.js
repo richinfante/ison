@@ -16,17 +16,17 @@ tap.test('objects', function (childTest) {
 tap.test('Bases', function (childTest) {
   let input = nuon.parse(`{ a: 0xF, b: 0b1, c: 0o7, d: 10 }`)
 
-  childTest.strictSame(input.a, 0xF)
-  childTest.strictSame(input.b, 0b1),
-  childTest.strictSame(input.c, 7)
-  childTest.strictSame(input.d, 10)
+  childTest.strictSame(input.a, 0xF, 'check read properly')
+  childTest.strictSame(input.b, 0b1, 'check read properly'),
+  childTest.strictSame(input.c, 7, 'check read properly')
+  childTest.strictSame(input.d, 10, 'check read properly')
   childTest.end()
 })
 
 tap.test('null', function (childTest) {
   let input = nuon.parse(`{ a: null }`)
 
-  childTest.strictSame(input.a, null)
+  childTest.strictSame(input.a, null, 'check is null')
   childTest.end()
 })
 
