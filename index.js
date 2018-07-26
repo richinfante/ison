@@ -29,6 +29,8 @@ function stringify(object) {
     return `Map(${stringify(Array.from(object.entries()))})`
   } else if(object instanceof RegExp){
     return `RegExp(${stringify(object.source)}, ${stringify(object.flags)})`
+  } else if (typeof object == 'boolean') {
+    return `${object}`
   } else if (object instanceof Object) {
     let name = object['$type'] || object.constructor.name
 

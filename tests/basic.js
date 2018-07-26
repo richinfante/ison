@@ -23,6 +23,17 @@ tap.test('Bases', function (childTest) {
   childTest.end()
 })
 
+tap.test('booleans', function (childTest) {
+  let input = nuon.parse(`{ a: false, b: true }`)
+  let output = nuon.parse(nuon.stringify(input))
+
+  childTest.notOk(input.a)
+  childTest.ok(input.b)
+  childTest.strictSame(input, output)
+
+  childTest.end()
+})
+
 
 
 tap.test('RegExp', function (childTest) {

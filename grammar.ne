@@ -36,7 +36,8 @@ HEX -> [0-9A-Fa-f]:+                        {% d => d[0].join("") %}
 OCT -> [0-7]:+                              {% d => d[0].join("") %}
 
 # PRIMITIVE CONSTANTS
-BOOLEAN -> "true" | "false"                 {% d => d[0] == "true" ? true : false  %}
+BOOLEAN -> "true"                           {% d => true  %}
+         | "false"                          {% d => false  %}
 NULL -> "null"                              {% d => null %}
 NAN -> "NaN"                                {% d => NaN %}
 INFINITY -> "Infinity"                      {% d => Infinity %}
