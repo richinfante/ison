@@ -17,3 +17,13 @@ tap.test('json-parse', function (childTest) {
   JSON.parse(vectors.large)
   childTest.end()
 })
+
+tap.test('nuon-stringify', function (childTest) {
+  nuon.stringify(vectors.large_obj)
+  childTest.end()
+})
+
+tap.test('json-stringify', function (childTest) {
+  JSON.stringify(vectors.large_obj)
+  childTest.end()
+})
