@@ -1,3 +1,5 @@
+const types_debug = require('debug')('types')
+
 const types = {
   'Date': Date,
   'Object': Object,
@@ -28,7 +30,7 @@ const funcs = {
 }
 
 function newInstance(name, args) {
-  // console.log('newInstance', name, args)
+  types_debug('newInstance', name, args)
   if (types[name]) {
     return new types[name](...args)
   }
@@ -53,18 +55,18 @@ function newInstance(name, args) {
 
 
 function preprocessFloat(str) {
-  // console.log('preprocess float', str)
+  types_debug('preprocess float', str)
   return parseFloat(str)
 }
 
 function preprocessInt(str, radix) {
-  // console.log('preprocess int', str)
+  types_debug('preprocess int', str)
   return parseInt(str, radix)
 }
 
 
 function preprocessString(str) {
-  // console.log('preprocess string', str)
+  types_debug('preprocess string', str)
   let output = str.substring(1, str.length - 1)
   return output
 }

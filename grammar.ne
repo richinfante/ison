@@ -21,8 +21,8 @@ const {
   preprocessInt, 
   preprocessString, 
   preprocessFloat, 
-  newInstance 
-} = require('./nuon_types.js')
+  newInstance
+} = require('./types.js')
 
 %}
 

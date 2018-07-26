@@ -25,8 +25,8 @@ const {
   preprocessInt, 
   preprocessString, 
   preprocessFloat, 
-  newInstance 
-} = require('./nuon_types.js')
+  newInstance
+} = require('./types.js')
 
 var grammar = {
     Lexer: lexer,
@@ -64,8 +64,8 @@ var grammar = {
     {"name": "VALUE", "symbols": ["STRING"], "postprocess": d => { return d[0] }},
     {"name": "VALUE", "symbols": ["DICT"], "postprocess": d => { return d[0] }},
     {"name": "VALUE", "symbols": ["ARRAY"], "postprocess": d => { return d[0] }},
-    {"name": "VALUE", "symbols": ["BOOLEAN"], "postprocess": d => { return d[0] }},
     {"name": "VALUE", "symbols": ["CONS"], "postprocess": d => { return d[0] }},
+    {"name": "VALUE", "symbols": ["BOOLEAN"], "postprocess": d => { return d[0] }},
     {"name": "VALUE", "symbols": ["NULL"], "postprocess": d => { return d[0] }},
     {"name": "VALUE", "symbols": ["NAN"], "postprocess": d => { return d[0] }},
     {"name": "VALUE", "symbols": ["INFINITY"], "postprocess": d => { return d[0] }},
