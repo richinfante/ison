@@ -63,25 +63,32 @@ We can also utilize custom object constructors such as the follow for location. 
 
 When loaded using the NUON js library, it would appear as the following, if no `Location` class is loaded.
 
-```js
+```json
 {
-  vehicles: [{
-    serialNumber: 'BUS-122',
-    route: 12,
-    status: 'On Time',
-    location: {
-      $type: 'Location',
-      latitude: 40.7484,
-      longitude: -73.9857
+  "vehicles": [{
+    "serialNumber": "BUS-122",
+    "route": 12,
+    "status": "On Time",
+    "location": {
+      "$type": "Location",
+      "latitude": 40.7484,
+      "longitude": -73.9857
     }
   }]
 }
 ```
 
-NUON also supports buffers, maps, sets, and
+NUON also supports buffers, maps, sets, and regular expressions!
 ```js
 {
+  created: Date(1532571987475),
   data: Buffer('deadbeef', 'hex'),
-  name: Buffer('hello, world!', 'ascii')
+  name: Buffer('hello, world!', 'ascii'),
+  regex: RegExp('0x[a-f0-9]+', 'i'),
+  set: Set([ 1,2,3,4 ]),
+  map: Map([
+    ['abc', 'def'],
+    ['ghi', 'jkl']
+  ])
 }
 ```
