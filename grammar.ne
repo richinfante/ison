@@ -35,10 +35,11 @@ BIN -> [01]:+                               {% d => d[0].join("") %}
 HEX -> [0-9A-Fa-f]:+                        {% d => d[0].join("") %}
 OCT -> [0-7]:+                              {% d => d[0].join("") %}
 
-# PRIMITIVE NUMBERS
+# PRIMITIVE CONSTANTS
 BOOLEAN -> "true" | "false"                 {% d => d[0] == "true" ? true : false  %}
 NULL -> "null"                              {% d => null %}
 NAN -> "NaN"                                {% d => NaN %}
+INFINITY -> "Infinity"                      {% d => Infinity %}
 
 HEXNUM -> %hex                              {% d => preprocessInt(d[0].value.substr(2), 16) %}
 OCTNUM -> %oct                              {% d => preprocessInt(d[0].value.substr(2), 8) %}
@@ -70,18 +71,18 @@ ARRAY -> "[" _ "]"                          {% d => { return [] } %}
 
 
 # VALUE
-VALUE -> 
-     STRING                                 {% d => { return d[0] } %}
-    | DICT                                  {% d => { return d[0] } %}
-    | ARRAY                                 {% d => { return d[0] } %}
-    | CONS                                  {% d => { return d[0] } %}
-    | BOOLEAN                               {% d => { return d[0] } %}
-    | NULL                                  {% d => { return d[0] } %}
-    | NAN                                   {% d => { return d[0] } %}
-    | BINNUM                                {% d => { return d[0] } %}
-    | HEXNUM                                {% d => { return d[0] } %}
-    | OCTNUM                                {% d => { return d[0] } %}
-    | DECNUM                                {% d => { return d[0] } %}
+VALUE ->  STRING                            {% d => { return d[0] } %}
+       | DICT                               {% d => { return d[0] } %}
+       | ARRAY                              {% d => { return d[0] } %}
+       | CONS                               {% d => { return d[0] } %}
+       | BOOLEAN                            {% d => { return d[0] } %}
+       | NULL                               {% d => { return d[0] } %}
+       | NAN                                {% d => { return d[0] } %}
+       | INFINITY                           {% d => { return d[0] } %}
+       | BINNUM                             {% d => { return d[0] } %}
+       | HEXNUM                             {% d => { return d[0] } %}
+       | OCTNUM                             {% d => { return d[0] } %}
+       | DECNUM                             {% d => { return d[0] } %}
 CONS -> %identifier _ "(" _ ")"             {% d => { return newInstance(d[0].value, []) } %}
 CONS -> %identifier _ "(" _ CSVALUE _ ")"   {% d => { return newInstance(d[0].value, d[4]) } %}
 

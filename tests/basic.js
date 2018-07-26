@@ -23,6 +23,17 @@ tap.test('Bases', function (childTest) {
   childTest.end()
 })
 
+
+
+tap.test('RegExp', function (childTest) {
+  let input = /nuon|json/gi
+
+  let output = nuon.parse(nuon.stringify(input))
+
+  childTest.strictSame(input, output, 'stringify-parse loop recreates regex')
+  childTest.end()
+})
+
 tap.test('null', function (childTest) {
   let input = nuon.parse(`{ a: null }`)
 
@@ -39,6 +50,15 @@ tap.test('NaN', function (childTest) {
   childTest.end()
 })
 
+
+tap.test('infinity', function (childTest) {
+  const obj = { a: Infinity, b: 2}
+  let input3 = nuon.parse(nuon.stringify(obj))
+
+  childTest.notOk(isFinite(obj.a), 'check is not finite')
+  childTest.strictSame(input3, obj, 'stringify-parse loop yields same object')
+  childTest.end()
+})
 
 tap.test('arrays', function (childTest) {
   const input = [ 1, 2, new Date(), { a: 1, b: 2 }, Object({ e: 1, f: 2 }), [[1], 2], 3]

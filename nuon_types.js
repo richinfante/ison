@@ -17,10 +17,14 @@ if (typeof Set != undefined) {
   types['Set'] = Set
 }
 
+if (typeof RegExp != undefined) {
+  types['RegExp'] = RegExp
+}
+
 const funcs = {
   'Int': parseInt,
   'Float': parseFloat,
-  'Bool': el => el.toLowerCase() == 'true'
+  'Boolean': el => new Boolean(el.toLowerCase() == 'true')
 }
 
 function newInstance(name, args) {

@@ -4,6 +4,27 @@
 
 A better object notation with Date and custom types support, and JSON compatibility.
 
+## Supported Built-in Types
+- [x] String (and primitives)
+  - [x] Single quotes
+  - [x] Double quotes
+- [x] Number (and primitives)
+  - [x] NaN
+  - [x] Infinity
+  - [x] Hex representation (`0xa1b2c3`)
+  - [x] Oct representation (`0o134717`)
+  - [x] Bin representation (`0b101011`)
+  - [x] Dec representation (`-1000`, `1000.324`)
+- [x] Boolean (and primitives)
+- [x] Array (and literals)
+- [x] Object (and literals)
+  - [x] quoted keys
+  - [x] bare keys
+- [x] Maps
+- [x] Sets
+- [x] RegExp
+- [x] Custom objects via `$type`
+
 ## Examples:
 
 NUON allows for dates, as well as a more relaxed syntax. we do not require keys to be quoted, as long as the conform to the regex `/[a-zA-Z_][_a-zA-Z0-9]*/`. Arbitrary keys must be quoted strings, but for a well designed schema this should not be required.
@@ -12,15 +33,13 @@ Notation for custom objects uses a function-like syntax. Essentially, it mimics 
 
 ```js
 {
-
   website: "Blog example",
   posts: [{
     title: "My first post!",
     published: Date(1532524806137),
-    content: 'Hello, World!',
-    author: '@richinfante'
+    content: "Hello, World!",
+    author: "@richinfante"
   }]
-
 }
 ```
 
@@ -57,7 +76,7 @@ When loaded using the NUON js library, it would appear as the following, if no `
 }
 ```
 
-NUON also supports buffers!
+NUON also supports buffers, maps, sets, and
 ```js
 {
   data: Buffer('deadbeef', 'hex'),

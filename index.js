@@ -25,9 +25,11 @@ function stringify(object) {
     return `[${object.map(stringify).join(', ')}]`
   } else if(object.constructor.name == 'Set') {
     return `Set(${stringify(Array.from(object))})`
-  }  else if(object.constructor.name == 'Map') {
+  } else if(object.constructor.name == 'Map') {
     return `Map(${stringify(Array.from(object.entries()))})`
-  }else if (object instanceof Object) {
+  } else if(object instanceof RegExp){
+    return `RegExp(${stringify(object.source)}, ${stringify(object.flags)})`
+  } else if (object instanceof Object) {
     let name = object['$type'] || object.constructor.name
 
     delete object['$type']
