@@ -35,6 +35,18 @@ tap.test('booleans', function (childTest) {
 })
 
 
+tap.test('strings', function (childTest) {
+  let input = nuon.parse(`{ a: "abc\"d", b: "a,b,c" , c: "'a'"}`)
+  let output = nuon.parse(nuon.stringify(input))
+
+  childTest.notOk(input.a)
+  childTest.ok(input.b)
+  childTest.strictSame(input, output)
+
+  childTest.end()
+})
+
+
 
 tap.test('RegExp', function (childTest) {
   let input = /nuon|json/gi
@@ -82,16 +94,16 @@ tap.test('arrays', function (childTest) {
 
 
 
-// Test date serialization
-tap.test('dates', function (childTest) {
-  let date = new Date()
-  let date2 = nuon.parse(nuon.stringify(date))
+// // Test date serialization
+// tap.test('dates', function (childTest) {
+//   let date = new Date()
+//   let date2 = nuon.parse(nuon.stringify(date))
 
-  childTest.strictSame(date, date2, 'stringify-parse yields same date')
-  childTest.strictSame(date.getTime(), date2.getTime(), 'date timestamps are equal')
+//   childTest.strictSame(date, date2, 'stringify-parse yields same date')
+//   childTest.strictSame(date.getTime(), date2.getTime(), 'date timestamps are equal')
   
-  childTest.end()
-})
+//   childTest.end()
+// })
 
 
 tap.test('buffers', function (childTest) {

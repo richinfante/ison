@@ -16,7 +16,8 @@ const {
 } = require('./types.js')
 
 function parseValue(value) {
-  convert_debug('PARSE VALUE: ' + value)
+  value = value.trim()
+  convert_debug('PARSE VALUE: ', value)
 
   if (value == 'null') { 
     return null
@@ -38,7 +39,7 @@ function parseValue(value) {
     return false
   }
 
-  if (value[0] == value[value.length-1] && (value[0] == '"' || value[0] == '"')) {
+  if (value[0] == value[value.length-1] && (value[0] == '"' || value[0] == "'")) {
     return preprocessString(value)
   }
 
@@ -89,6 +90,14 @@ class Parser {
     return this.current == '\n' || this.current == ' ' || this.current == '\t'
   }
 
+  skip(token) {
+    if(this.current == token) {
+      this.next()
+    } else {
+      throw new Error(`expected token "${token}" got "${this.current}"!`)
+    }
+  }
+
   skipWhitespace() {
     debug('skip whitespace!')
     while (this.isWhitespace) {
@@ -132,17 +141,39 @@ class Parser {
     }
   }
 
-  enterContext() {
-    this.skipWhitespace()
-
+  pushContext() {
     if(this.isEnter) {
+      debug(`push context: "${this.current}"`)
+      debug(this)
       this.contexts.push(pairMap[this.current])
       this.next()
     } else {
-      let identifier = this.untilSeparator()
-      let constructorValues = this.enterContext()
+      throw new Error('cannot push a context here!')
+    }
+  }
 
-      return newInstance(identifier.trim(), constructorValues)
+  enterContext() {
+    debug(`entered context with symbol: "${this.current}"`)
+    this.skipWhitespace()
+
+    if(this.isEnter) {
+      this.pushContext()
+    } else {
+      debug('non-entrance context, searching for type!')
+      let identifier = this.untilSeparator()
+
+
+      if(this.isExit || this.current == ',') { 
+        debug(`exit context, new value`)
+        return parseValue(identifier)
+      } else if (this.current == '(') {
+        let constructorValues = this.enterContext()
+
+        debug(`exit context, new constructor`)
+        return newInstance(identifier.trim(), constructorValues)
+      } else {
+        throw new Error(`Unexpected Context Enter ${this.current}`)
+      }
     }
 
     this.skipWhitespace()
@@ -153,33 +184,36 @@ class Parser {
       let obj = {}
       debug('entered object!')
       debug(this)
+
+      // While we DO NOT have an exit token
       while(!this.isExit) {
+
+        // Skip any whitespace
         this.skipWhitespace()
+
+        // Find until next separator
         let key = this.untilSeparator()
-        this.next()
+
+        // Skip the ':' token
+        this.skip(':')
+
+        // Skip whitespace
         this.skipWhitespace()
         
-        if(this.isEnter) {
-          let value = this.enterContext()
-          key = parseValue(key.trim())
+        // Enter a new context, get the value.
+        let value = this.enterContext()
 
-          obj[key] = value
-        } else {
+        // parse the key value
+        key = parseValue(key.trim())
 
-          let value = this.untilSeparator()
+        // Save
+        obj[key] = value
 
-          key = parseValue(key.trim())
-          value = parseValue(value.trim())
-
-          // console.log(key, '=', value)
-
-          obj[key] = value
+        // If it's not an exit, skip.
+        if(!this.isExit) {
+          this.skipWhitespace()
+          this.skip(',')
         }
-
-           if(!this.isExit) {
-            this.next()
-          }
-
       }
       
       debug('exit object!')
@@ -191,22 +225,22 @@ class Parser {
       let obj = []
       debug('entered array!')
       debug(this)
+
+      // Comma separated list.
       while(!this.isExit) {
+        // Skip whitespace
         this.skipWhitespace()
 
-        if(this.isEnter) {
-          let value = this.enterContext()
-          obj.push(value)
-        } else {
-          let value = this.untilSeparator()
-         
-          value = parseValue(value.trim())
-          obj.push(value)
-        }
-        if(!this.isExit) {
-          this.next()
-        }
+        // Enter a new context
+        let value = this.enterContext()
+        
+        // Push the value
+        obj.push(value)
 
+        // Skip commas
+        if(!this.isExit) {
+          this.skip(',')
+        }
       }
       
       debug('exit array!')
@@ -222,12 +256,15 @@ class Parser {
       debug('exit context ' + this.currentContext)
       let out = this.contexts.pop()
       if(out != this.current) {
-        throw new Error(`Error! Mismatched context @ ${this.cur}! (expected: ${out}, found: ${this.current}`)
+        throw new Error(`Error! Mismatched context @ ${this.cur}! (expected: "${out}", found: "${this.current}")`)
       }
 
+
       this.next()
+      this.skipWhitespace()
 
       debug(`new context is` + this.contexts)
+
     } else {
       throw new Error('tried to exit a context that was not finished!')
     }
