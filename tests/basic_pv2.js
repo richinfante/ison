@@ -94,16 +94,16 @@ tap.test('arrays', function (childTest) {
 
 
 
-// // Test date serialization
-// tap.test('dates', function (childTest) {
-//   let date = new Date()
-//   let date2 = nuon.parse(nuon.stringify(date))
+// Test date serialization
+tap.test('dates', function (childTest) {
+  let date = new Date()
+  let date2 = nuon.parse(nuon.stringify(date))
 
-//   childTest.strictSame(date, date2, 'stringify-parse yields same date')
-//   childTest.strictSame(date.getTime(), date2.getTime(), 'date timestamps are equal')
+  childTest.strictSame(date, date2, 'stringify-parse yields same date')
+  childTest.strictSame(date.getTime(), date2.getTime(), 'date timestamps are equal')
   
-//   childTest.end()
-// })
+  childTest.end()
+})
 
 
 tap.test('buffers', function (childTest) {

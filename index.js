@@ -19,7 +19,7 @@ function stringify(object) {
     return `Date(${object.getTime()})`
   } else if (typeof object == 'string' || object instanceof String) {
     // Place into double quoted (escaped) strings
-    return `"${object.replace(/"/g, '\\"')}"`
+    return `"${object.replace(/"/g, '"')}"`
   } else if (object instanceof Array) {
     // Join the stringification of children
     return `[${object.map(stringify).join(', ')}]`
