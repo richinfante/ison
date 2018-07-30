@@ -8,7 +8,8 @@ const vectors = {
 
 tap.test('strings', function (childTest) {
   let input = nuon.parse(vectors.string)
-  let output = nuon.parse(nuon.stringify(input))
+  let so = nuon.stringify(input)
+  let output = nuon.parse(so)
 
   childTest.strictSame(input, { 
     a: "abc'd", 
@@ -16,6 +17,7 @@ tap.test('strings', function (childTest) {
     c: `"'a'`,
     d: `a'bcdef`
   })
+  
   childTest.strictSame(input, output)
 
   childTest.end()

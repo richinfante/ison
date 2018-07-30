@@ -1,8 +1,20 @@
+/** 
+ * PV3 Experimental Nuon Parser
+ * This is designed to be ported into other languages, such as rust.
+ * It will run faster there.
+ *
+ *
+ * This parser is cursor based.
+ * We have a finite set of tokens we should encounter at a specific index.
+ * We can then use those to determine what to do next.
+ */
+
 const debug = {
   log: require('debug')('parser:log'),
   array: require('debug')('parser:array'),
   object: require('debug')('parser:object'),
-  skip: require('debug')('parser:skip')
+  skip: require('debug')('parser:skip'),
+  string: require('debug')('parser:string'),
 }
 
 const { 
@@ -12,18 +24,12 @@ const {
   newInstance
 } = require('./types.js')
 
-// Context Types
-const CTX_OBJECT = 0x01
-const CTX_ARRAY = 0x02
-const CTX_CONSTRUCTOR = 0x03
-const CTX_STRING = 0x04
-
+// Tokens
 const TOKEN_INFINITY = 'Infinity'
 const TOKEN_NAN      = 'NaN'
 const TOKEN_TRUE     = 'true'
 const TOKEN_FALSE    = 'false'
 const TOKEN_NULL     = 'null'
-
 const TOKEN_LBRACE   = '{'
 const TOKEN_RBRACE   = '}'
 const TOKEN_LBRACKET = '['
@@ -35,13 +41,14 @@ const TOKEN_DQUOTE   = `"`
 const TOKEN_COMMA    = `,`
 const TOKEN_COLON    = ':'
 const TOKEN_WS       = /[ \n\t]/
-
+const TOKEN_STRING_START = /["']/
 const TOKEN_IDENTIFIER = /[a-z0-9_]/i
 const TOKEN_IDENTIFIER_START = /[a-z_]/i
-
 const TOKEN_NUMBER_START = /[+0-9\-]/
 const TOKEN_NUMBER = /[0-9xbo\.+\-a-f]/i
+const TOKEN_ESCAPE = '\\'
 
+// Convert an identifier into a primitive value.
 function fromIdentifier(value) {
 
   if (value == TOKEN_NULL) { 
@@ -65,13 +72,6 @@ function fromIdentifier(value) {
   }
 
   throw new Error('Unknown Identifier' + string)
-}
-
-function parse(string) {
-  let p = new Parser(string)
-  let result = p.parseNext()
-  debug.log('result', result)
-  return result
 }
 
 class Parser {
@@ -115,11 +115,50 @@ class Parser {
       this.printError(`Unexpected token character ${this.current} (${this.current.charCodeAt(0)})`)
     } 
 
+    if(num.indexOf('0x') == 0) {
+      return parseInt(num.substr(2), 16)
+    } else if(num.indexOf('0b') == 0) {
+      return parseInt(num.substr(2), 2)
+    } else if(num.indexOf('0o') == 0) {
+      return parseInt(num.substr(2), 8)
+    }
+
     return parseFloat(num)
   }
 
   parseString() {
-    return '<nyi>'
+    debug.string('Parsing String.')
+    if(!this.is(TOKEN_STRING_START)) {
+      this.printError('Invalid String start token')
+    }
+    
+    let start = this.current
+    this.skip(TOKEN_STRING_START, true, 1)
+    let out = ''
+
+
+    debug.string(`Entered string with "${start}" (${start.charCodeAt(0)})`)
+    
+    while(true) {
+      debug.string(`Have "${this.current}" (${this.current.charCodeAt(0)})`)
+      if(this.is(TOKEN_ESCAPE)) {
+        out += this.next()
+        debug.string('Got escape for', this.current)
+      } else if(this.is(start)) {
+        debug.string('End of string')
+        break
+      } else {
+        out += this.current
+        debug.string('Append', this.current)
+      }
+
+      this.next()
+    }
+
+    this.skip(TOKEN_STRING_START, true, 1)
+
+    debug.string(`output: "${out}"`)
+    return out
   }
 
   parseArguments() {
@@ -204,9 +243,12 @@ class Parser {
     while(!this.is(TOKEN_RBRACE)) {
       let key = null
 
+      this.skip(TOKEN_WS)
+
       debug.object('parsing key')
+
       // Allowing quoted keys, use quote opt. to figure out which.
-      if (this.is(TOKEN_SQUOTE) || this.is(TOKEN_DQUOTE)) {
+      if (this.is(TOKEN_STRING_START)) {
         key = this.parseString()
       } else {
         key = this.parseIdentifier()
@@ -262,15 +304,18 @@ class Parser {
       return this.parseArguments()
     } else if (this.is(TOKEN_NUMBER_START)) {
       return this.parseNumber()
-    } else {
+    } else if (this.is(TOKEN_STRING_START)) {
+      return this.parseString()
+    } else if (this.is(TOKEN_IDENTIFIER_START)){
       let identifier = this.parseIdentifier()
-
       if(this.is(TOKEN_LPAREN)) {
         let args = this.parseArguments()
         return newInstance(identifier, args)
       } else {
         return fromIdentifier(identifier)
       }
+    } else {
+      this.printError(`Unexpected token "${this.current}" (${this.current.charCodeAt(0)})`)
     }
   }
 
@@ -307,7 +352,8 @@ class Parser {
 
     let count = current - l_bound
     console.log(this.string.substring(l_bound, u_bound).replace(/\n/g, ' '))
-    console.log('^'.padStart(count - 1))
+    console.log('^'.padStart(count + 1))
+    console.log('index:', this.cur)
     
     throw new Error(error)
   }
@@ -331,7 +377,7 @@ class Parser {
     let old = this.cur
 
     if(token instanceof RegExp) {
-      if(strict && token.test(this.current)) {
+      if(strict && !token.test(this.current)) {
         this.printError(`expected token "${token}" got "${this.current}"!`)
       }
 
@@ -355,6 +401,97 @@ class Parser {
 }
 
 
-const { stringify } = require('./')
+
+function stringify(object) {
+  if (object instanceof Date) {
+    // Serialize dates
+    return `Date(${object.getTime()})`
+  } else if (typeof object == 'string' || object instanceof String) {
+    // Place into double quoted (escaped) strings
+    return `"${object.replace(/"/g, '\\"')}"`
+  } else if (object instanceof Array) {
+    // Join the stringification of children
+    return `[${object.map(stringify).join(', ')}]`
+  } else if(object.constructor.name == 'Set') {
+    return `Set(${stringify(Array.from(object))})`
+  } else if(object.constructor.name == 'Map') {
+    return `Map(${stringify(Array.from(object.entries()))})`
+  } else if(object instanceof RegExp){
+    return `RegExp(${stringify(object.source)}, ${stringify(object.flags)})`
+  } else if (typeof object == 'boolean') {
+    return `${object}`
+  } else if (object instanceof Object) {
+    let name = object['$type'] || object.constructor.name
+
+    delete object['$type']
+
+    // Join key value pairs. Possibly use $type or constructor name
+    if (name == 'Object') {
+      return `{${Object.entries(object).map((item) => {
+        return `${item[0]}: ${stringify(item[1])}`
+      }).join(', ')}}`
+    } else {
+      return `${name}({${Object.entries(object).map((item) => {
+        return `${item[0]}: ${stringify(item[1])}`
+      }).join(', ')}})`
+    }
+  } else if (isNaN(object)) {
+    return 'NaN'
+  } else if (typeof object == 'number') {
+    // Number
+    return `${object}`
+  } else {
+    console.log(object, typeof object)
+    throw new Error('Stringify Error!')
+  }
+}
+
+function pprint(string) {
+  let output = ''
+  let level = 0
+
+  for (let i = 0; i < string.length; i++) {
+    if (['{', '[', ','].indexOf(string[i]) > -1) {
+
+      output += string[i] + '\n'
+
+      if (['{', '['].indexOf(string[i]) > -1) {
+        level += 1;
+      }
+
+      for (let c = 0; c < level; c++) {
+        output += '    ';
+      }
+
+    } else if (['}', ']'].indexOf(string[i]) > -1) {
+      level -= 1;
+      output += '\n'
+      for (let c = 0; c < level; c++) {
+        output += '    ';
+      }
+
+      output += string[i]
+    } else {
+
+
+      if (string[i] != ' ') {
+        output += string[i]
+      }
+
+      if (string[i] == ':') {
+        output += ' '
+      }
+    } 
+  }
+
+  return output
+}
+
+
+function parse(string) {
+  let p = new Parser(string)
+  let result = p.parseNext()
+  return result
+}
 
 module.exports = { parse, stringify }
