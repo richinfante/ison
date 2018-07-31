@@ -250,6 +250,8 @@ class Parser {
       // Allowing quoted keys, use quote opt. to figure out which.
       if (this.is(TOKEN_STRING_START)) {
         key = this.parseString()
+      } else if (this.is(TOKEN_NUMBER_START)) {
+        key = this.parseNumber()
       } else {
         key = this.parseIdentifier()
       }
