@@ -10,3 +10,12 @@ tap.test('buffers', function (childTest) {
 
   childTest.end()
 })
+
+tap.test('buffers', function(childTest) {
+  let obj = { created: new Date(), author: 'rich', content: Buffer.from('hello, world', 'ascii')}
+  let x = nuon.stringify(obj)
+  let y = nuon.parse(x)
+
+  childTest.strictSame(y, obj)
+  childTest.end()
+})

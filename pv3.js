@@ -416,6 +416,8 @@ function stringify(object) {
     return `Set(${stringify(Array.from(object))})`
   } else if(object.constructor.name == 'Map') {
     return `Map(${stringify(Array.from(object.entries()))})`
+  } else if (object instanceof Buffer) {
+    return `Buffer([${[...object]}])`
   } else if(object instanceof RegExp){
     return `RegExp(${stringify(object.source)}, ${stringify(object.flags)})`
   } else if (typeof object == 'boolean') {

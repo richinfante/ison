@@ -1,5 +1,7 @@
 const types_debug = require('debug')('types')
 
+// Type constructors
+// Called with "new" to create an instance
 const types = {
   'Date': Date,
   'Object': Object,
@@ -7,38 +9,54 @@ const types = {
   'Number': Number
 }
 
-if (typeof Map != undefined) {
-  types['Map'] = Map
-}
-
-if (typeof Set != undefined) {
-  types['Set'] = Set
-}
-
-if (typeof RegExp != undefined) {
-  types['RegExp'] = RegExp
-}
-
+// Functions
+// Called normally with arguments to create instance.
 const funcs = {
   'Int': parseInt,
   'Float': parseFloat,
   'Boolean': el => new Boolean(el.toLowerCase() == 'true')
 }
 
+// Detect Map support
+if (typeof Map != undefined) {
+  types['Map'] = Map
+}
+
+// Detect Set support
+if (typeof Set != undefined) {
+  types['Set'] = Set
+}
+
+// Detect RegExp support
+if (typeof RegExp != undefined) {
+  types['RegExp'] = RegExp
+}
+
+// Detect if buffer.from is available.
 if (typeof Buffer != undefined) {
-  funcs['Buffer'] = Buffer.from
+  // If it is, check if Buffer.from() is supported.
+  if (typeof Buffer.from === "function") {
+    funcs['Buffer'] = Buffer.from
+  } else {
+    // Fallback to constructor.
+    types['Buffer'] = Buffer
+  }
 }
 
 
 function newInstance(name, args) {
   types_debug('newInstance', name, args)
+
+  // Create a new instance using a constructor
   if (types[name]) {
     return new types[name](...args)
   }
   
+  // Create a new instance using functions
   if (funcs[name]) {
     return funcs[name](...args)
   }
+  
   
   if (typeof args == 'string') {
     let instance = new Object(args)
