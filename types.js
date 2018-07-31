@@ -7,10 +7,6 @@ const types = {
   'Number': Number
 }
 
-if (typeof Buffer != undefined) {
-  types['Buffer'] = Buffer
-}
-
 if (typeof Map != undefined) {
   types['Map'] = Map
 }
@@ -28,6 +24,11 @@ const funcs = {
   'Float': parseFloat,
   'Boolean': el => new Boolean(el.toLowerCase() == 'true')
 }
+
+if (typeof Buffer != undefined) {
+  funcs['Buffer'] = Buffer.from
+}
+
 
 function newInstance(name, args) {
   types_debug('newInstance', name, args)

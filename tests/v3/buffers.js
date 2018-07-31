@@ -6,7 +6,7 @@ tap.test('buffers', function (childTest) {
     data: Buffer('deadbeef', 'hex')
   }`)
 
-  childTest.strictSame(input.data, new Buffer('deadbeef', 'hex'))
+  childTest.strictSame(input.data, Buffer.from('deadbeef', 'hex'))
 
   childTest.end()
 })
