@@ -1,5 +1,5 @@
 const tap = require('tap')
-const nuon = require('../../pv3.js')
+const nuon = require('../../parser.js')
 
 // Test date serialization
 tap.test('dates', function (childTest) {

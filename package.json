@@ -2,10 +2,9 @@
   "name": "uon",
   "version": "0.0.1",
   "description": "A better object notation",
-  "main": "index.js",
+  "main": "parser.js",
   "scripts": {
-    "test": "npm run build && node tests/basic.js",
-    "build": "nearleyc grammar.ne -o grammar.js"
+    "test": "tap tests/v3"
   },
   "author": "rich@richinfante.com",
   "license": "MIT",

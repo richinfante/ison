@@ -102,6 +102,10 @@ class Parser {
     return identifier
   }
 
+  /**
+   * Parse an identifier. These should be valid JS object keys.
+   * @return {number} The number that was parsed.
+   */
   parseNumber() {
     this.skip(TOKEN_WS)
 
@@ -126,6 +130,10 @@ class Parser {
     return parseFloat(num)
   }
 
+  /**
+   * Parse a string
+   * @return {string} the string that was parsed.
+   */
   parseString() {
     debug.string('Parsing String.')
     if(!this.is(TOKEN_STRING_START)) {
@@ -161,6 +169,10 @@ class Parser {
     return out
   }
 
+  /**
+   * Parse an argument list
+   * @return {array} an array containing all the arguments.
+   */
   parseArguments() {
     this.skip(TOKEN_LPAREN, true, 1)
     this.skip(TOKEN_WS)
@@ -194,7 +206,7 @@ class Parser {
 
   /**
    * Parse an array.
-   * @return {[type]} [description]
+   * @return {array} returns array items
    */
   parseArray() {
     this.skip(TOKEN_LBRACKET, true, 1)
@@ -229,7 +241,7 @@ class Parser {
 
   /**
    * Parse an object notation block.
-   * @return {[type]} [description]
+   * @return {object} The represented object.
    */
   parseObject() {
 
@@ -292,7 +304,7 @@ class Parser {
   /**
    * Parse the next item.
    * This is used to parse a value of any type 
-   * @return {[type]} [description]
+   * @return {any} The value
    */
   parseNext() {
     debug.log('parse next!')

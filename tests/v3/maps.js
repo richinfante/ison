@@ -1,5 +1,5 @@
 const tap = require('tap')
-const nuon = require('../../pv3.js')
+const nuon = require('../../parser.js')
 
 tap.test('maps', function (childTest) {
   let map = nuon.parse(`Map([

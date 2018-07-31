@@ -1,10 +1,6 @@
 # NUON
 
-**DISCLAIMER: This package is experimental. Although it should be stable for most cases, you most likely shouldn't trust it yet for production use**
-
-**Currently, this module is 75x slower for parsing (due to the way the experimental parser works) and 3x slower for stringification from the native JSON library**
-
-A better object notation with Date and custom types support, and JSON compatibility.
+A better object notation with Date and custom types support, and _JSON compatibility_.
 
 ## Supported Built-in Types
 - [x] String (and primitives)

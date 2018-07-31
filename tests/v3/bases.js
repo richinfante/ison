@@ -1,5 +1,5 @@
 const tap = require('tap')
-const nuon = require('../../pv3.js')
+const nuon = require('../../parser.js')
 
 tap.test('Bases', function (childTest) {
   let input = nuon.parse(`{ a: 0xF, b: 0b1, c: 0o7, d: 10 }`)

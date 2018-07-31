@@ -1,5 +1,5 @@
 const tap = require('tap')
-const nuon = require('../../pv3.js')
+const nuon = require('../../parser.js')
 
 tap.test('arrays', function (childTest) {
   const input = [ 1, 2, new Date(), { a: 1, b: 2 }, Object({ e: 1, f: 2 }), [[1], 2], 3]

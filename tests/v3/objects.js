@@ -1,5 +1,5 @@
 const tap = require('tap')
-const nuon = require('../../pv3.js')
+const nuon = require('../../parser.js')
 
 tap.test('objects', function (childTest) {
   const obj = { a: -1, b: { c: 2 }}
