@@ -41,10 +41,10 @@ Date(1532524806137)
 The following number formats are allowed:
 ```js
 {
-  a: 0xFF,
-  b: 0b11111111,
-  c: 0o377,
-  d: 255
+  a: 0xFF,  // Hex
+  b: 0b11111111,  // Binary
+  c: 0o377, // Octal
+  d: 255 // Decimal
 }
 ```
 
@@ -66,11 +66,20 @@ NUON also supports buffers, maps, sets, and regular expressions! Implementing la
 
 ```js
 {
+  // Dates via unix timestamp
   created: Date(1532571987475),
+
+  // Buffers stored in hex, ascii, etc.
   data: Buffer('deadbeef', 'hex'),
   name: Buffer('hello, world!', 'ascii'),
+
+  // Regular expressions
   regex: RegExp('0x[a-f0-9]+', 'i'),
+
+  // Sets
   set: Set([ 1,2,3,4 ]),
+
+  // Maps
   map: Map([
     ['abc', 'def'],
     ['ghi', 'jkl']
