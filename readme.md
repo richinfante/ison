@@ -23,7 +23,6 @@ A better object notation with Date and custom types support, Comments, and _JSON
 - [x] Maps
 - [x] Sets
 - [x] RegExp
-- [x] Custom objects via `$type`
 
 ## Examples:
 
@@ -38,7 +37,8 @@ Date(1532524806137)
 ```
 
 ### Numbers
-The following number formats are allowed:
+The following number formats are allowed. Note: the C-style syntax for octals is not supported (leading `0`), as it it can be confusing.
+
 ```js
 {
   a: 0xFF,  // Hex
@@ -95,7 +95,22 @@ Object({ a: 1 }) === { a: 1 }
 ```
 
 ### Arrays
-The same follows for arays. These are equivalent, but the latter of the two is preferred because it is more concise.
+The same follows for arrays. These are equivalent, but the latter of the two is preferred because it is more concise.
 ```js
 Array( 1, 2, 3 ) === [ 1, 2, 3 ]
 ```
+
+### Custom Types
+Currently, custom types support is in the works. At the moment, custom type support works as the following.
+
+1. Serialization
+  - Gather all key value pairs using Object.entries()
+  - Pass as an object argument to `obj.constructor.name`
+
+2. De-serialization
+  - Find a constructor function for the value
+    - Call using `new ${constructor}(...args)` or `${function}(...args)`.
+
+  - If it does not exist, return the arguments.
+    - If there is exactly one argument, it is returned.
+    - If there are more than one, an array is returned.

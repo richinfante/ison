@@ -58,17 +58,11 @@ function newInstance(name, args) {
   }
   
   
-  if (typeof args == 'string') {
-    let instance = new Object(args)
-    instance['$type'] = name
-
-    return instance
-  } else {
-    let instance = new Object(...args)
-    instance['$type'] = name
-
-    return instance
-  }
+  if (args.length == 1) {
+     return args[0]
+   } else {
+     return args
+   }
   
 }
 
