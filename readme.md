@@ -1,5 +1,7 @@
 # NUON
 
+**Warning: Mostly stable. Should not be relied on for production use yet.**
+
 A better object notation with Date and custom types support, and _JSON compatibility_.
 
 ## Supported Built-in Types
@@ -27,54 +29,41 @@ A better object notation with Date and custom types support, and _JSON compatibi
 
 NUON allows for dates, as well as a more relaxed syntax. we do not require keys to be quoted, as long as the conform to the regex `/[a-zA-Z_][_a-zA-Z0-9]*/`. Arbitrary keys must be quoted strings, but for a well designed schema this should not be required.
 
-Notation for custom objects uses a function-like syntax. Essentially, it mimics the object's constructor. The `new` is required (or allowed) in NUON however, since it is a notation and not a scripting language. It is technically a subset of Javascript, however, so it is theoretically possible to run directly in a Javascript interpreter with the correct functions defined.
+
+### Dates
+Dates are serialized using their UNIX timestamps. Although this implementation is in JavaScript, implementations should load this into their native date APIs.
+
+```js
+Date(1532524806137)
+```
+
+### Numbers
+The following number formats are allowed:
+```js
+{
+  a: 0xFF,
+  b: 0b11111111,
+  c: 0o377,
+  d: 255
+}
+```
+
+### Booleans
 
 ```js
 {
-  website: "Blog example",
-  posts: [{
-    title: "My first post!",
-    published: Date(1532524806137),
-    content: "Hello, World!",
-    author: "@richinfante"
-  }]
+  a: true,
+  b: false
 }
 ```
 
-We can also utilize custom object constructors such as the follow for location. If a type cannot be found, it is passed into the `Object()` constructor, and then the `$type` variable is set on it.
+### Strings
+Strings can use either single or double quotes.
 
-```js
-{
-  vehicles: [{
-    serialNumber: 'BUS-122',
-    route: 12,
-    status: 'On Time',
-    location: Location({
-      latitude: 40.7484,
-      longitude: -73.9857
-    })
-  }]
-}
-```
+### Types
 
-When loaded using the NUON js library, it would appear as the following, if no `Location` class is loaded.
+NUON also supports buffers, maps, sets, and regular expressions! Implementing languages should convert these to their native equivalents.
 
-```json
-{
-  "vehicles": [{
-    "serialNumber": "BUS-122",
-    "route": 12,
-    "status": "On Time",
-    "location": {
-      "$type": "Location",
-      "latitude": 40.7484,
-      "longitude": -73.9857
-    }
-  }]
-}
-```
-
-NUON also supports buffers, maps, sets, and regular expressions!
 ```js
 {
   created: Date(1532571987475),
@@ -87,4 +76,17 @@ NUON also supports buffers, maps, sets, and regular expressions!
     ['ghi', 'jkl']
   ])
 }
+```
+
+### Objects
+Object keys do not need to be quoted, unless they do not match the following regex: `/[a-z_][_a-z0-9]*/i`. Additionally, these are equivalent, but the latter of the two is preferred because it is more concise.
+
+```js
+Object({ a: 1 }) === { a: 1 }
+```
+
+### Arrays
+The same follows for arays. These are equivalent, but the latter of the two is preferred because it is more concise.
+```js
+Array( 1, 2, 3 ) === [ 1, 2, 3 ]
 ```
