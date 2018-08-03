@@ -1,8 +1,8 @@
 const tap = require('tap')
-const nuon = require('../../parser.js')
+const ison = require('../../parser.js')
 
 tap.test('Bases', function (childTest) {
-  let input = nuon.parse(`{ a: 0xF, b: 0b1, c: 0o7, d: 10 }`)
+  let input = ison.parse(`{ a: 0xF, b: 0b1, c: 0o7, d: 10 }`)
 
   childTest.strictSame(input.a, 0xF, 'check read properly')
   childTest.strictSame(input.b, 0b1, 'check read properly'),

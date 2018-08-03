@@ -1,8 +1,8 @@
 const tap = require('tap')
-const nuon = require('../../parser.js')
+const ison = require('../../parser.js')
 
 tap.test('buffers', function (childTest) {
-  let input = nuon.parse(`{
+  let input = ison.parse(`{
     data: Buffer('deadbeef', 'hex')
   }`)
 
@@ -13,8 +13,8 @@ tap.test('buffers', function (childTest) {
 
 tap.test('buffers', function(childTest) {
   let obj = { created: new Date(), author: 'rich', content: Buffer.from('hello, world', 'ascii')}
-  let x = nuon.stringify(obj)
-  let y = nuon.parse(x)
+  let x = ison.stringify(obj)
+  let y = ison.parse(x)
 
   childTest.strictSame(y, obj)
   childTest.end()

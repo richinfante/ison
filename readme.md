@@ -1,4 +1,4 @@
-# NUON
+# ISON
 
 **Warning: Mostly stable. Should not be relied on for production use yet.**
 
@@ -27,7 +27,7 @@ A better object notation with Date and custom types support, Comments, and _JSON
 
 ## Examples:
 
-NUON allows for dates, as well as a more relaxed syntax. we do not require keys to be quoted, as long as the conform to the regex `/[a-zA-Z_][_a-zA-Z0-9]*/`. Arbitrary keys must be quoted strings, but for a well designed schema this should not be required.
+ISON allows for dates, as well as a more relaxed syntax. we do not require keys to be quoted, as long as the conform to the regex `/[a-zA-Z_][_a-zA-Z0-9]*/`. Arbitrary keys must be quoted strings, but for a well designed schema this should not be required.
 
 
 ### Dates
@@ -62,7 +62,7 @@ Strings can use either single or double quotes.
 
 ### Types
 
-NUON also supports buffers, maps, sets, and regular expressions! Implementing languages should convert these to their native equivalents.
+ISON also supports buffers, maps, sets, and regular expressions! Implementing languages should convert these to their native equivalents.
 
 ```js
 {

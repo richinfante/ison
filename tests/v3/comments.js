@@ -1,15 +1,15 @@
 const tap = require('tap')
-const nuon = require('../../parser.js')
+const ison = require('../../parser.js')
 const fs = require('fs')
 
 const vectors = {
-  comments: fs.readFileSync('./tests/vectors/comments.nuon', 'utf8'),
+  comments: fs.readFileSync('./tests/vectors/comments.ison', 'utf8'),
 }
 
 tap.test('strings', function (childTest) {
-  let input = nuon.parse(vectors.comments)
-  let so = nuon.stringify(input)
-  let output = nuon.parse(so)
+  let input = ison.parse(vectors.comments)
+  let so = ison.stringify(input)
+  let output = ison.parse(so)
 
   childTest.strictSame(input, output)
 

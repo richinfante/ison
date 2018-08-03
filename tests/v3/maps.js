@@ -1,14 +1,14 @@
 const tap = require('tap')
-const nuon = require('../../parser.js')
+const ison = require('../../parser.js')
 
 tap.test('maps', function (childTest) {
-  let map = nuon.parse(`Map([
+  let map = ison.parse(`Map([
     [ 1, 2 ],
     [ 3, 4 ],
     [ 5, 6 ]
   ])`)
 
-  let res = nuon.parse(nuon.stringify(new Map([
+  let res = ison.parse(ison.stringify(new Map([
     [ 1, 2 ],
     [ 3, 4 ],
     [ 5, 6 ]

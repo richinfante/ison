@@ -1,5 +1,5 @@
 {
-  "name": "nuon",
+  "name": "ison",
   "version": "0.0.1",
   "description": "A better object notation with Date and custom types support",
   "main": "parser.js",
