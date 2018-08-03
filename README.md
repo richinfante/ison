@@ -1,5 +1,9 @@
 # ISON
 
+[![Build Status](https://travis-ci.org/richinfante/ison.svg?branch=master)](https://travis-ci.org/richinfante/ison)
+[![npm](https://img.shields.io/npm/v/ison.svg)](http://npmjs.com/ison)
+![license](https://img.shields.io/github/license/richinfante/ison.svg)
+
 **Warning: Mostly stable. Should not be relied on for production use yet.**
 
 A better object notation with Date and custom types support, Comments, and _JSON compatibility<sup>*</sup>_.
