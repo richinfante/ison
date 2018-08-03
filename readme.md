@@ -2,10 +2,7 @@
 
 **Warning: Mostly stable. Should not be relied on for production use yet.**
 
-A better object notation with Date and custom types support, and _JSON compatibility_.
-
-## Grammar
-The grammar is provided, written in `nearelyjs`. See: `grammar.ne`
+A better object notation with Date and custom types support, Comments, and _JSON compatibility_.
 
 ## Supported Built-in Types
 - [x] String (and primitives)
