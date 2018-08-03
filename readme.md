@@ -2,7 +2,7 @@
 
 **Warning: Mostly stable. Should not be relied on for production use yet.**
 
-A better object notation with Date and custom types support, Comments, and _JSON compatibility_.
+A better object notation with Date and custom types support, Comments, and _JSON compatibility<sup>*</sup>_.
 
 ## Supported Built-in Types
 - [x] String (and primitives)
@@ -114,3 +114,6 @@ Currently, custom types support is in the works. At the moment, custom type supp
   - If it does not exist, return the arguments.
     - If there is exactly one argument, it is returned.
     - If there are more than one, an array is returned.
+    
+## Notes
+- <sup>*</sup> All valid JSON documents are valid ISON documents, but the converse is not true.
