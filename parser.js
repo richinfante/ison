@@ -39,7 +39,7 @@ const TOKEN_RPAREN   = ')'
 const TOKEN_SQUOTE   = `'`
 const TOKEN_DQUOTE   = `"`
 const TOKEN_COMMA    = `,`
-const TOKEN_COLON    = ':'
+const TOKEN_COLON    = /[:=]/
 const TOKEN_WS       = /[ \n\t]/
 const TOKEN_STRING_START = /["']/
 const TOKEN_IDENTIFIER = /[a-z0-9_]/i
@@ -47,6 +47,11 @@ const TOKEN_IDENTIFIER_START = /[a-z_]/i
 const TOKEN_NUMBER_START = /[+0-9\-]/
 const TOKEN_NUMBER = /[0-9xbo\.+\-a-f]/i
 const TOKEN_ESCAPE = '\\'
+const TOKEN_NEWLINE = '\n'
+const TOKEN_LINE_COMMENT = '//'
+const TOKEN_BLOCK_COMMENT_START = '/*'
+const TOKEN_BLOCK_COMMENT_END = '*/'
+
 
 // Convert an identifier into a primitive value.
 function fromIdentifier(value) {
@@ -374,7 +379,14 @@ class Parser {
 
   next () {
     this.cur += 1
+    if (this.cur > this.string.length) {
+      printError('Unexpected EOF!')
+    }
     return this.current
+  }
+
+  peek() {
+    return this.string[this.cur + 1]
   }
 
   clear() {
@@ -385,32 +397,78 @@ class Parser {
     return this.stored
   }
 
+
+  seek (token) {
+    while(!this.currentMatches(token)) {
+      this.next()
+      debug.skip('(seek) skipping', this.current)
+    }
+  }
+
+  currentMatches(token) {
+    if (token instanceof RegExp) {
+      return token.test(this.current)
+    } else {
+      return this.current == token
+    }
+  }
+
   // SKIP any number of tokens.
   skip(token, strict=false, count=Infinity) {
     debug.skip('skipping', token)
     let old = this.cur
 
-    if(token instanceof RegExp) {
-      if(strict && !token.test(this.current)) {
-        this.printError(`expected token "${token}" got "${this.current}"!`)
-      }
+    // If we're in strict mode, fail immediately.
+    if (strict && !this.currentMatches(token)) {
+      this.printError(`expected token "${token}" got "${this.current}"!`)
+    }
 
-      while(token.test(this.current) && count > 0) {
-        this.cur += 1
-        count -= 1
-      }
-    } else {
-      if(strict && this.current != token) {
-        this.printError(`expected token "${token}" got "${this.current}"!`)
-      }
-
-      while(this.current == token && count > 0) {
-        this.cur += 1
-        count -= 1
-      }
+    // While it matches, continue.
+    while(this.currentMatches(token) && count > 0) {
+      this.cur += 1
+      count -= 1
     }
 
     debug.skip('skipped ahead', this.cur - old)
+
+    // If we're skipping whitespace, 
+    // Perform a skip for comments as well, if the token matches.
+    if (token == TOKEN_WS) {
+      debug.skip('check comment seek')
+
+      // If we're on a line comment
+      if (this.current + this.peek() == TOKEN_LINE_COMMENT) {
+        // Seek past it
+        this.seek(TOKEN_NEWLINE)
+      }
+
+      // If we're on a block comment
+      if (this.current + this.peek() == TOKEN_BLOCK_COMMENT_START) {
+        
+        while(true) {
+          // Seek to the next '*'  
+          this.seek('*')
+
+          // If it makes up a comment end, break.
+          if (this.current + this.peek() == TOKEN_BLOCK_COMMENT_END) {
+            break
+          } else {
+            // Otherwise, continue.
+            this.next()
+          }
+        }
+
+        // Skip past the end comment.
+        this.next()
+        this.next()
+      }
+
+      // If it's still whitespace, skip.
+      // TOKEN_WS can only handle one comment at a time.
+      if (this.is(TOKEN_WS)) {
+        this.skip(TOKEN_WS)
+      }
+    }
   }
 }
 

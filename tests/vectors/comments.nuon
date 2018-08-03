@@ -1,0 +1,16 @@
+{
+  // Name your package
+  // Make it something interesting!
+  name: 'nuon',
+
+  /**
+   * Multiline comment
+   * @type {number}
+   */
+  value: 0xFF,
+
+  item:
+  // Comments are interpreted as whitespace!
+  'A string!'
+
+}
