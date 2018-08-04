@@ -1,6 +1,6 @@
 {
   "name": "ison",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A better object notation with Date and custom types support",
   "main": "parser.js",
   "scripts": {
@@ -9,9 +9,7 @@
   "author": "rich@richinfante.com",
   "license": "MIT",
   "dependencies": {
-    "debug": "^3.1.0",
-    "moo": "^0.4.3",
-    "nearley": "^2.15.0"
+    "debug": "^3.1.0"
   },
   "devDependencies": {
     "tap": "^12.0.1"
