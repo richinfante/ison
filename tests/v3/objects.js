@@ -28,3 +28,15 @@ tap.test('numkey', function (childTest) {
   childTest.strictSame(input3, obj, 'stringify-parse loop yields same object')
   childTest.end()
 })
+
+
+
+tap.test('weirdkey', function (childTest) {
+  const obj = { 'abc-def*@': 'test' }
+  let input = ison.parse(`{ "abc-def*@": 'test' }`)
+  let input3 = ison.parse(ison.stringify(obj))
+
+  childTest.strictSame(input, obj, 'parsing works')
+  childTest.strictSame(input3, obj, 'stringify-parse loop yields same object')
+  childTest.end()
+})

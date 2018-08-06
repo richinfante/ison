@@ -472,6 +472,13 @@ class Parser {
   }
 }
 
+function stringifyKey(key) {
+  if(/^[a-zA-Z_][_a-zA-Z0-9]*$/.test(key)) {
+    return key
+  } else {
+    return stringify(key)
+  }
+}
 
 
 function stringify(object) {
@@ -502,11 +509,11 @@ function stringify(object) {
     // Join key value pairs. Possibly use $type or constructor name
     if (name == 'Object') {
       return `{${Object.entries(object).map((item) => {
-        return `${item[0]}: ${stringify(item[1])}`
+        return `${stringifyKey(item[0])}: ${stringify(item[1])}`
       }).join(', ')}}`
     } else {
       return `${name}({${Object.entries(object).map((item) => {
-        return `${item[0]}: ${stringify(item[1])}`
+        return `${stringifyKey(item[0])}: ${stringify(item[1])}`
       }).join(', ')}})`
     }
   } else if (isNaN(object)) {
