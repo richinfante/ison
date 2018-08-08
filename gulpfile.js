@@ -6,10 +6,10 @@ const uglify = require('gulp-uglify')
 const rename = require('gulp-rename')
 const stripCode = require('gulp-strip-code')
 const comment = `/*!
-ISON v${require('./package.json').version}
-(c) 2018 Rich Infante
-Released under the MIT License.
-*/
+ * ISON v${require('./package.json').version}
+ * (c) 2018 Rich Infante
+ * Released under the MIT License.
+ */
 `
 
 gulp.task('default', () =>
