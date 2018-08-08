@@ -31,7 +31,8 @@ gulp.task('default', () =>
           'debug.array',
           'debug.object',
           'debug.skip',
-          'debug.string'
+          'debug.string',
+          'debug.types'
         ]
       }
     }))
