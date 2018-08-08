@@ -119,5 +119,11 @@ Currently, custom types support is in the works. At the moment, custom type supp
     - If there is exactly one argument, it is returned.
     - If there are more than one, an array is returned.
     
+
+## FAQ
+- Doesn't this format take up more space?
+  - Not necessarily. Often, it's actually smaller. This is due to the fact that most JSON typing is often done using a field named `type` and then attaching all of the other data to it as well.
+  - Also, the requirement for most dictionary keys to be quoted has been dropped, removing much more wasted space.
+
 ## Notes
 - <sup>*</sup> All valid JSON documents are valid ISON documents, but the converse is not true.
