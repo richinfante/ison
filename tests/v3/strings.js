@@ -1,5 +1,5 @@
 const tap = require('tap')
-const ison = require('../../parser.js')
+const ison = require(process.env.PARSER_FILE || '../../parser.js')
 const fs = require('fs')
 
 const vectors = {

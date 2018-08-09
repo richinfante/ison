@@ -1,5 +1,5 @@
 const tap = require('tap')
-const ison = require('../../parser.js')
+const ison = require(process.env.PARSER_FILE || '../../parser.js')
 
 tap.test('buffers', function (childTest) {
   let input = ison.parse(`{

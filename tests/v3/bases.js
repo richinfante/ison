@@ -1,5 +1,5 @@
 const tap = require('tap')
-const ison = require('../../parser.js')
+const ison = require(process.env.PARSER_FILE || '../../parser.js')
 
 tap.test('Bases', function (childTest) {
   let input = ison.parse(`{ a: 0xF, b: 0b1, c: 0o7, d: 10 }`)

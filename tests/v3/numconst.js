@@ -1,5 +1,5 @@
 const tap = require('tap')
-const ison = require('../../parser.js')
+const ison = require(process.env.PARSER_FILE || '../../parser.js')
 
 tap.test('NaN', function (childTest) {
   const obj = { a: NaN, b: 2}

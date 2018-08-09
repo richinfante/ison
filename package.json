@@ -1,6 +1,6 @@
 {
   "name": "ison",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A better object notation with Date and custom types support",
   "repository": {
     "type": "git",
@@ -8,7 +8,7 @@
   },
   "main": "parser.js",
   "scripts": {
-    "test": "tap tests/v3",
+    "test": "tap tests/v3 && PARSER_FILE='../../dist/parser.js' tap tests/v3 && PARSER_FILE='../../dist/parser.min.js' tap tests/v3",
     "build": "gulp"
   },
   "author": "rich@richinfante.com",

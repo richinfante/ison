@@ -138,37 +138,42 @@
   const TOKEN_BLOCK_COMMENT_END = '*/'
 
 
-  // Convert an identifier into a primitive value.
-  function fromIdentifier(value) {
-
-    if (value == TOKEN_NULL) { 
-      return null
-    }
-
-    if (value == TOKEN_INFINITY) { 
-      return Infinity
-    }
-
-    if (value == TOKEN_NAN) { 
-      return NaN
-    }
-
-    if (value == TOKEN_TRUE) { 
-      return true
-    }
-
-    if (value == TOKEN_FALSE) { 
-      return false
-    }
-
-    throw new Error('Unknown Identifier' + string)
-  }
-
   class Parser {
     constructor(string) {
       this.cur = 0
       this.string = string
       this.stored = ''
+    }
+
+    /**
+     * Convert an identifier into a primitive value.
+     * @param  {string} value a string representing some predefined value.
+     * @return {Any}       the represented value
+     * @throws {Error} If the value is not found.
+     */
+    fromIdentifier(value) {
+
+      if (value == TOKEN_NULL) { 
+        return null
+      }
+
+      if (value == TOKEN_INFINITY) { 
+        return Infinity
+      }
+
+      if (value == TOKEN_NAN) { 
+        return NaN
+      }
+
+      if (value == TOKEN_TRUE) { 
+        return true
+      }
+
+      if (value == TOKEN_FALSE) { 
+        return false
+      }
+
+      this.printError(`Unknown Identifier: "${value}"`)
     }
 
     /**
@@ -416,52 +421,39 @@
           let args = this.parseArguments()
           return newInstance(identifier, args)
         } else {
-          return fromIdentifier(identifier)
+          return this.fromIdentifier(identifier)
         }
       } else {
         this.printError(`Unexpected token "${this.current}" (${this.current.charCodeAt(0)})`)
       }
     }
 
+    /**
+     * Check if the current character is a token
+     * @param  {RegExp|string}  token a token description
+     * @return {Boolean}       does it match the current?
+     */
     is(token) {
-      let ret = false
-
       if(token instanceof RegExp) {
-        ret = token.test(this.current)
+        return token.test(this.current)
       } else {
-        ret = this.current == token
+        return this.current == token
       }
-
-      debug.log('check is', this.current, token, ret)
-      
-      return ret
     }
 
+    /**
+     * Get the character under the cursor
+     * @return {string} the character
+     */
     get current() {
       return this.string[this.cur]
     }
 
-
-    printError(error='Unknown Error') {
-      let current = this.cur
-      let l_bound = current - 10
-      if(l_bound < 0) {
-        l_bound = 0
-      }
-
-      let u_bound = current + 10
-      if (u_bound >= this.string.length) {
-        u_bound = this.string.length - 1
-      }
-
-      let count = current - l_bound
-      console.log(this.string.substring(l_bound, u_bound).replace(/\n/g, ' '))
-      console.log('^'.padStart(count + 1))
-      console.log('index:', this.cur)
-      
-      throw new Error(error)
-    }
-
+    /**
+     * Advance the cursor and get the next value
+     * @throws {Error} If we need a next character and we found EOF.
+     * @return {string} the next character
+     */
     next () {
       this.cur += 1
       if (this.cur > this.string.length) {
@@ -470,46 +462,43 @@
       return this.current
     }
 
+    /**
+     * Returns the next character in the input string.
+     * @return {string} next input character
+     */
     peek() {
       return this.string[this.cur + 1]
     }
 
-    clear() {
-      this.stored = ''
-    }
 
-    getParsed() {
-      return this.stored
-    }
-
-
+    /**
+     * Seek forward in the input for a specific token
+     * @param  {RegExp|string} token token to find.
+     */
     seek (token) {
-      while(!this.currentMatches(token)) {
+      while(!this.is(token)) {
         this.next()
         debug.skip('(seek) skipping', this.current)
       }
     }
 
-    currentMatches(token) {
-      if (token instanceof RegExp) {
-        return token.test(this.current)
-      } else {
-        return this.current == token
-      }
-    }
-
-    // SKIP any number of tokens.
+    /**
+     * Skip matching tokens.
+     * @param  {RegExp|String}  token  token to skip
+     * @param  {Boolean} strict should we fail if this cannot be found?
+     * @param  {Number}  count  skip a certain amount of tokens.
+     */
     skip(token, strict=false, count=Infinity) {
       debug.skip('skipping', token)
       let old = this.cur
 
       // If we're in strict mode, fail immediately.
-      if (strict && !this.currentMatches(token)) {
+      if (strict && !this.is(token)) {
         this.printError(`expected token "${token}" got "${this.current}"!`)
       }
 
       // While it matches, continue.
-      while(this.currentMatches(token) && count > 0) {
+      while(this.is(token) && count > 0) {
         this.cur += 1
         count -= 1
       }
@@ -555,8 +544,42 @@
         }
       }
     }
+
+    /**
+     * Throw an error, internal use function.
+     * throws an error with source printout, error description.
+     * @throws {Error} If true
+     * @param  {String} error error description
+     */
+    printError(error='Unknown Error') {
+      let current = this.cur
+      let l_bound = current - 10
+      if(l_bound < 0) {
+        l_bound = 0
+      }
+
+      let u_bound = current + 10
+      if (u_bound >= this.string.length) {
+        u_bound = this.string.length - 1
+      }
+
+      let count = current - l_bound
+
+      throw new Error(`Could not parse input.
+${this.string.substring(l_bound, u_bound).replace(/\n/g, ' ')}
+${'^'.padStart(count + 1)}
+${error}
+at input: ${this.cur}`)
+    }
   }
 
+  /**
+   * Stringify a key.
+   * This may add quotes if it does not conform to bare key requirements.
+   * 
+   * @param  {string} key the object key
+   * @return {string}     string representing the key.
+   */
   function stringifyKey(key) {
     if(/^[a-zA-Z_][_a-zA-Z0-9]*$/.test(key)) {
       return key
@@ -566,6 +589,11 @@
   }
 
 
+  /**
+   * Stringify an object, recursively
+   * @param  {object} object to stringify
+   * @return {string}        string representation
+   */
   function stringify(object) {
     if (object instanceof Date) {
       // Serialize dates
@@ -625,10 +653,13 @@
   }
 
   // Module shim.
+  // Export depending on environment
+  var exported_funcs = { parse, stringify }
+
   if(typeof module != "undefined") {
-    module.exports = { parse, stringify }
+    module.exports = exported_funcs
   } else if (typeof window != "undefined") {
-    window['ISON'] = { parse, stringify }
+    window['ISON'] = exported_funcs
   }
 
 })();
