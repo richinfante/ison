@@ -612,49 +612,6 @@
     }
   }
 
-  function pprint(string, spacing) {
-    let output = ''
-    let level = 0
-    spacing = spacing || '  '
-
-    for (let i = 0; i < string.length; i++) {
-      if (['{', '[', ','].indexOf(string[i]) > -1) {
-
-        output += string[i] + '\n'
-
-        if (['{', '['].indexOf(string[i]) > -1) {
-          level += 1;
-        }
-
-        for (let c = 0; c < level; c++) {
-          output += spacing;
-        }
-
-      } else if (['}', ']'].indexOf(string[i]) > -1) {
-        level -= 1;
-        output += '\n'
-        for (let c = 0; c < level; c++) {
-          output += spacing;
-        }
-
-        output += string[i]
-      } else {
-
-
-        if (string[i] != ' ') {
-          output += string[i]
-        }
-
-        if (string[i] == ':') {
-          output += ' '
-        }
-      } 
-    }
-
-    return output
-  }
-
-
   /**
    * Parse a string using the parser.
    * @param  {ison string} string ison formatted string representing data.
@@ -669,9 +626,9 @@
 
   // Module shim.
   if(typeof module != "undefined") {
-    module.exports = { parse, stringify, pprint }
+    module.exports = { parse, stringify }
   } else if (typeof window != "undefined") {
-    window['ISON'] = { parse, stringify, pprint }
+    window['ISON'] = { parse, stringify }
   }
 
 })();
