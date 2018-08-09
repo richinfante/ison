@@ -1,7 +1,11 @@
 {
   "name": "ison",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A better object notation with Date and custom types support",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/richinfante/ison.git"
+  },
   "main": "parser.js",
   "scripts": {
     "test": "tap tests/v3",
