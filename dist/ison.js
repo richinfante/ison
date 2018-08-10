@@ -1,5 +1,5 @@
 /*!
- * ISON v0.0.10
+ * ISON v0.0.11
  * (c) 2018 Rich Infante
  * Released under the MIT License.
  */
@@ -238,7 +238,7 @@
     function parseString() {
       debug.string('Parsing String.')
       if(!is(TOKEN_STRING_START)) {
-        printError('Invalid String start token')
+        printFoundExpectedError(current(), TOKEN_STRING_START)
       }
       
       let start = current()

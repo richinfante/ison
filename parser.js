@@ -233,7 +233,7 @@
     function parseString() {
       debug.string('Parsing String.')
       if(!is(TOKEN_STRING_START)) {
-        printError('Invalid String start token')
+        printFoundExpectedError(current(), TOKEN_STRING_START)
       }
       
       let start = current()
