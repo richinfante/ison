@@ -1,3 +1,4 @@
+/* debug-block */
 /** 
  * PV3 Experimental ISON Parser
  * This is designed to be ported into other languages, such as rust.
@@ -11,6 +12,7 @@
  * For in-console debugging, set DEBUG env variable
  * For in-browser debugging, set DEBUG variable to true.
  */
+/* end-debug-block */
 
 (function() {
 
@@ -85,25 +87,56 @@
     }
   }
 
+  /**
+   * Add types to the ISON parser.
+   * It will instantiate using them
+   * @param {object} object dictionary of object names and constructors.
+   */
+  function addTypes(object) {
+    debug.types('adding', object)
+    for(let i in object) {
+      types[i] = object[i]
+    }
+    debug.types('types are now', types)
+  }
+
+  /**
+   * Remove types from the ISON parser.
+   * It will remove them from the type index.
+   * @param {object} object dictionary of object names and constructors to remove..
+   */
+  function removeTypes(object) {
+    debug.types('removing', object)
+    for (let i in object) {
+      if(types[i] === object[i]) {
+        delete types[i]
+      }
+    }
+    debug.types('types are now', types)
+  }
 
   function newInstance(name, args) {
     debug.types('newInstance', name, args)
 
     // Create a new instance using a constructor
     if (types[name]) {
+      debug.types('found class for name', name, 'instantiating with args', args)
       return new types[name](...args)
     }
     
     // Create a new instance using functions
     if (funcs[name]) {
+      debug.types('found function for name', name, 'calling with args', args)
       return funcs[name](...args)
     }
     
     
     if (args.length == 1) {
-       return args[0]
+        debug.types('no type found, returning args[0]')
+        return args[0]
      } else {
-       return args
+        debug.types('no type found, returning args[]')
+        return args
      }
     
   }
@@ -634,9 +667,18 @@ at input: ${cur}`)
           return `${stringifyKey(item[0])}:${stringify(item[1])}`
         }).join(',')}}`
       } else {
-        return `${name}({${Object.entries(object).map((item) => {
-          return `${stringifyKey(item[0])}:${stringify(item[1])}`
-        }).join(',')}})`
+        if (typeof object.destructor == 'function') {
+          let destructed = object.destructor()
+          if(destructed instanceof Array) {
+            return `${name}(${destructed.map(stringify).join(',')})`
+          } else {
+            return `${name}(${stringify(destructed)})`
+          }
+        } else {
+          return `${name}({${Object.entries(object).map((item) => {
+            return `${stringifyKey(item[0])}:${stringify(item[1])}`
+          }).join(',')}})`
+        }
       }
     } else if (isNaN(object)) {
       return 'NaN'
@@ -650,7 +692,7 @@ at input: ${cur}`)
   }
 
   // Module shim.
-  var exported_funcs = { parse, stringify }
+  var exported_funcs = { parse, stringify, addTypes, removeTypes }
 
   if(typeof module != "undefined") {
     module.exports = exported_funcs

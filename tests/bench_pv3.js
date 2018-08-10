@@ -1,5 +1,5 @@
 const tap = require('tap')
-const ison = require('../parser.js')
+const ison = require('../dist/ison.js')
 const fs = require('fs')
 
 const vectors = {
@@ -13,12 +13,22 @@ tap.test('ison-parse', function (childTest) {
   childTest.end()
 })
 
+tap.test('ison.min-parse', function (childTest) {
+  ison.parse(vectors.large)
+  childTest.end()
+})
+
 tap.test('json-parse', function (childTest) {
   JSON.parse(vectors.large)
   childTest.end()
 })
 
 tap.test('ison-stringify', function (childTest) {
+  ison.stringify(vectors.large_obj)
+  childTest.end()
+})
+
+tap.test('ison.min-stringify', function (childTest) {
   ison.stringify(vectors.large_obj)
   childTest.end()
 })

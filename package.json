@@ -1,31 +1,37 @@
 {
   "name": "ison",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "A better object notation with Date and custom types support",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/richinfante/ison.git"
   },
+  "bugs": { 
+    "url" : "https://github.com/richinfante/ison/issues"
+  },
+  "keywords": [
+    "ISON", "JSON", "object notation"
+  ],
   "main": "dist/ison.js",
   "scripts": {
-    "test": "tap tests/v3 && PARSER_FILE='../../dist/ison.js' tap tests/v3 && PARSER_FILE='../../dist/ison.min.js' tap tests/v3",
+    "test": "gulp && tap tests/v3 && PARSER_FILE='../../dist/ison.js' tap tests/v3 && PARSER_FILE='../../dist/ison.min.js' tap tests/v3",
     "build": "gulp",
     "release": "gulp && npm test && npm publish"
   },
   "author": "rich@richinfante.com",
   "license": "MIT",
-  "dependencies": {
-    "debug": "^3.1.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-plugin-minify-mangle-names": "^0.4.3",
     "babel-preset-env": "^1.7.0",
     "babel-preset-minify": "^0.4.3",
+    "debug": "^3.1.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.1",
     "gulp-insert": "^0.5.0",
     "gulp-rename": "^1.4.0",
+    "gulp-replace": "^1.0.0",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-strip-code": "^0.1.4",
     "gulp-uglify": "^3.0.1",

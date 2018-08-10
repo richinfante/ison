@@ -105,26 +105,95 @@ The same follows for arrays. These are equivalent, but the latter of the two is 
 Array( 1, 2, 3 ) === [ 1, 2, 3 ]
 ```
 
-### Custom Types
-Currently, custom types support is in the works. At the moment, custom type support works as the following.
+## Custom Types
+ISON now includes a custom types interface. This takes advantage of destructuring, but also allows for you to rename the types as they are exposed to the ISON parser. For completeness, it is recommended you provide a `destructor()` for your custom types.
 
-1. Serialization
-  - Gather all key value pairs using Object.entries()
-  - Pass as an object argument to `obj.constructor.name`
+```js
+const ison = require('./ison')
 
-2. De-serialization
-  - Find a constructor function for the value
-    - Call using `new ${constructor}(...args)` or `${function}(...args)`.
+// Define a few types
+ison.addTypes({ 
+  MySpecialType,
+  MyOtherType
+})
 
-  - If it does not exist, return the arguments.
-    - If there is exactly one argument, it is returned.
-    - If there are more than one, an array is returned.
-    
+// Remove them
+ison.removeTypes({
+  MyOtherType  
+})
+```
 
+In order to make a type compatible (i.e. stringify-able) from ISON, you must define a "destructor" on the instance. The values returned from the destructor are passed into the object's constructor.
+
+```js
+const ison = require('ison')
+
+class Location {
+  constructor({ latitude, longitude }) {
+    this.latitude = latitude
+    this.longitude = longitude
+  }
+
+  destructor() {
+    return { 
+      latitude: this.latitude, 
+      longitude: this.longitude
+    }
+  }
+}
+ison.addTypes({ Location }) // Required for parsing locations back into a Location instance
+ison.stringify(new Location({ latitude: 12.3456, longitude: 98.6765 })) // -> 'Location({latitude:12.3456,longitude:98.6765})'
+```
+
+However, if we are adding multiple arguments (or the only argument is an array) the destructor must return an array.
+```js
+const ison = require('ison')
+
+class List {
+  constructor(items) {
+    this.items = items
+  }
+
+  destructor() {
+    // For anything besides an object return, you MUST use an array to specify arguments
+    return [ this.items ]
+  }
+}
+
+// If we run:
+ison.addTypes({ List }) // Required for parsing Lists back into a List instance
+ison.stringify(new List([ 'make breakfast', 'go to the gym' ])) // -> List(["make breakfast","go to the gym"])
+```
+
+Multiple arguments example:
+```js
+const ison = require('./')
+
+class Point {
+  constructor(x,y,z) {
+    this.x = x
+    this.y = y
+    this.z = z
+  }
+
+  destructor() {
+    // For anything besides an object return, you MUST use an array to specify arguments
+    return [ this.x, this.y, this.z ]
+  }
+}
+
+// If we run: 
+ison.stringify(new Point(234, 345, 6778)) // -> 'Point(234,345,6778)'
+ison.addTypes({ Point }) // Required for parsing the point back into a Point instance
+ison.parse('Point(234,345,6778)') // Returns a new point instance with x,y,z.
+```
 ## FAQ
 - Doesn't this format take up more space?
   - Not necessarily. Often, it's actually smaller. This is due to the fact that most JSON typing is often done using a field named `type` and then attaching all of the other data to it as well.
   - Also, the requirement for most dictionary keys to be quoted has been dropped, removing much more wasted space.
+- How much space does ISON use?
+  - the minified version is only ~4.7kb
+  - the production versions of ISON in the `dist/` folder have no dependencies (other than standard JavaScript).
 
 ## Notes
 - <sup>*</sup> All valid JSON documents are valid ISON documents, but the converse is not true.

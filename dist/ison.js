@@ -1,51 +1,11 @@
 /*!
- * ISON v0.0.11
+ * ISON v0.0.12
  * (c) 2018 Rich Infante
  * Released under the MIT License.
- */
-/** 
- * PV3 Experimental ISON Parser
- * This is designed to be ported into other languages, such as rust.
- * It will run faster there.
- *
- *
- * This parser is cursor based.
- * We have a finite set of tokens we should encounter at a specific index.
- * We can then use those to determine what to do next.
- * 
- * For in-console debugging, set DEBUG env variable
- * For in-browser debugging, set DEBUG variable to true.
  */
 
 (function() {
 
-  /* debug-block */
-
-  // this is removed when minifying, since minifying removes debugging support.
-  // since debug is the only dependency, this shim is not needed, nor is the debug object.
-  // 
-  if (typeof require == "undefined") {
-    require = function(mod) {
-      if(mod == 'debug') {
-        return function(name) {
-          return function(...args) {
-            if(typeof DEBUG !="undefined" && DEBUG) console.log(name, ...args)
-          }
-        }
-      }
-    }
-  }
-
-  const debug = {
-    log: require('debug')('parser:log'),
-    array: require('debug')('parser:array'),
-    object: require('debug')('parser:object'),
-    skip: require('debug')('parser:skip'),
-    string: require('debug')('parser:string'),
-    types: require('debug')('parser:types')
-  }
-
-  /* end-debug-block */
   
   // Type constructors
   // Called with "new" to create an instance
@@ -90,9 +50,31 @@
     }
   }
 
+  /**
+   * Add types to the ISON parser.
+   * It will instantiate using them
+   * @param {object} object dictionary of object names and constructors.
+   */
+  function addTypes(object) {
+    for(let i in object) {
+      types[i] = object[i]
+    }
+  }
+
+  /**
+   * Remove types from the ISON parser.
+   * It will remove them from the type index.
+   * @param {object} object dictionary of object names and constructors to remove..
+   */
+  function removeTypes(object) {
+    for (let i in object) {
+      if(types[i] === object[i]) {
+        delete types[i]
+      }
+    }
+  }
 
   function newInstance(name, args) {
-    debug.types('newInstance', name, args)
 
     // Create a new instance using a constructor
     if (types[name]) {
@@ -106,9 +88,9 @@
     
     
     if (args.length == 1) {
-       return args[0]
+        return args[0]
      } else {
-       return args
+        return args
      }
     
   }
@@ -236,7 +218,6 @@
      * @return {string} the string that was parsed.
      */
     function parseString() {
-      debug.string('Parsing String.')
       if(!is(TOKEN_STRING_START)) {
         printFoundExpectedError(current(), TOKEN_STRING_START)
       }
@@ -244,29 +225,20 @@
       let start = current()
       skip(TOKEN_STRING_START, true, 1)
       let out = ''
-
-
-      debug.string(`Entered string with "${start}" (${start.charCodeAt(0)})`)
       
       while(true) {
-        debug.string(`Have "${current()}" (${current().charCodeAt(0)})`)
         if(is(TOKEN_ESCAPE)) {
           out += next()
-          debug.string('Got escape for', current())
         } else if(is(start)) {
-          debug.string('End of string')
           break
         } else {
           out += current()
-          debug.string('Append', current())
         }
 
         next()
       }
 
       skip(TOKEN_STRING_START, true, 1)
-
-      debug.string(`output: "${out}"`)
       return out
     }
 
@@ -346,8 +318,6 @@
      */
     function parseObject() {
 
-      debug.object('entering object.')
-
       skip(TOKEN_LBRACE, true, 1)
       skip(TOKEN_WS)
 
@@ -357,8 +327,6 @@
         let key = null
 
         skip(TOKEN_WS)
-
-        debug.object('parsing key')
 
         // Allowing quoted keys, use quote opt. to figure out which.
         if (is(TOKEN_STRING_START)) {
@@ -374,12 +342,8 @@
         skip(TOKEN_COLON, true, 1)
         skip(TOKEN_WS)
 
-        debug.object('got key', key)
-
         // Value can be anything, go next.
         let value = parseNext()
-
-        debug.object('got value', value)
 
         // Save the key
         object[key] = value
@@ -408,7 +372,6 @@
      * @return {any} The value
      */
     function parseNext() {
-      debug.log('parse next!')
       skip(TOKEN_WS)
 
       if (is(TOKEN_LBRACE)) {
@@ -486,7 +449,6 @@
     function seek (token) {
       while(!is(token)) {
         next()
-        debug.skip('(seek) skipping', current())
       }
     }
 
@@ -497,7 +459,6 @@
      * @param  {Number}  count  skip a certain amount of tokens.
      */
     function skip(token, strict=false, count=Infinity) {
-      debug.skip('skipping', token)
       let old = cur
 
       // If we're in strict mode, fail immediately.
@@ -511,12 +472,9 @@
         count -= 1
       }
 
-      debug.skip('skipped ahead', cur - old)
-
       // If we're skipping whitespace, 
       // Perform a skip for comments as well, if the token matches.
       if (token == TOKEN_WS) {
-        debug.skip('check comment seek')
 
         // If we're on a line comment
         if (current() + peek() == TOKEN_LINE_COMMENT) {
@@ -639,9 +597,18 @@ at input: ${cur}`)
           return `${stringifyKey(item[0])}:${stringify(item[1])}`
         }).join(',')}}`
       } else {
-        return `${name}({${Object.entries(object).map((item) => {
-          return `${stringifyKey(item[0])}:${stringify(item[1])}`
-        }).join(',')}})`
+        if (typeof object.destructor == 'function') {
+          let destructed = object.destructor()
+          if(destructed instanceof Array) {
+            return `${name}(${destructed.map(stringify).join(',')})`
+          } else {
+            return `${name}(${stringify(destructed)})`
+          }
+        } else {
+          return `${name}({${Object.entries(object).map((item) => {
+            return `${stringifyKey(item[0])}:${stringify(item[1])}`
+          }).join(',')}})`
+        }
       }
     } else if (isNaN(object)) {
       return 'NaN'
@@ -655,7 +622,7 @@ at input: ${cur}`)
   }
 
   // Module shim.
-  var exported_funcs = { parse, stringify }
+  var exported_funcs = { parse, stringify, addTypes, removeTypes }
 
   if(typeof module != "undefined") {
     module.exports = exported_funcs

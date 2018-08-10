@@ -4,8 +4,10 @@ const insert = require('gulp-insert')
 const sourcemaps = require('gulp-sourcemaps')
 const uglify = require('gulp-uglify')
 const rename = require('gulp-rename')
+const replace = require('gulp-replace')
 const stripCode = require('gulp-strip-code')
 const pump = require('pump')
+
 const comment = `/*!
  * ISON v${require('./package.json').version}
  * (c) 2018 Rich Infante
@@ -19,13 +21,16 @@ gulp.task('default', (cb) => {
       rename({
         basename: 'ison'
       }),
-      insert.prepend(comment),
-      gulp.dest('dist'),
-      sourcemaps.init(),
+      // Strip debugging info
       stripCode({
         start_comment: "debug-block",
         end_comment: "end-debug-block"
       }),
+      // Strip debug logs
+      replace(/^\s*debug\.[\w\d]+\(.*$\n/gm, ''),
+      insert.prepend(comment),
+      gulp.dest('dist'),
+      sourcemaps.init(),
       babel({
         presets: [["env", {
           "targets": {
@@ -34,17 +39,7 @@ gulp.task('default', (cb) => {
         }]],
       }),
       uglify({
-        compress:{
-          pure_funcs: [
-            'console.log',
-            'debug.log',
-            'debug.array',
-            'debug.object',
-            'debug.skip',
-            'debug.string',
-            'debug.types'
-          ]
-        }
+        compress: true
       }),
       insert.prepend(comment),
       sourcemaps.write('.'),
