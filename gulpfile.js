@@ -5,6 +5,7 @@ const sourcemaps = require('gulp-sourcemaps')
 const uglify = require('gulp-uglify')
 const rename = require('gulp-rename')
 const stripCode = require('gulp-strip-code')
+const pump = require('pump')
 const comment = `/*!
  * ISON v${require('./package.json').version}
  * (c) 2018 Rich Infante
@@ -12,34 +13,44 @@ const comment = `/*!
  */
 `
 
-gulp.task('default', () =>
-  gulp.src('parser.js')
-    .pipe(gulp.dest('dist'))
-    .pipe(sourcemaps.init())
-    .pipe(stripCode({
-      start_comment: "debug-block",
-      end_comment: "end-debug-block"
-    }))
-    .pipe(babel({
-        presets: ['env'],
-    }))
-    .pipe(uglify({
-      compress:{
-        pure_funcs: [
-          'console.log',
-          'debug.log',
-          'debug.array',
-          'debug.object',
-          'debug.skip',
-          'debug.string',
-          'debug.types'
-        ]
-      }
-    }))
-    .pipe(insert.prepend(comment))
-    .pipe(sourcemaps.write('.'))
-    .pipe(rename({
-      suffix: ".min"
-    }))
-    .pipe(gulp.dest('dist'))
-)
+gulp.task('default', (cb) => {
+    pump([
+      gulp.src('parser.js'),
+      rename({
+        basename: 'ison'
+      }),
+      insert.prepend(comment),
+      gulp.dest('dist'),
+      sourcemaps.init(),
+      stripCode({
+        start_comment: "debug-block",
+        end_comment: "end-debug-block"
+      }),
+      babel({
+        presets: [["env", {
+          "targets": {
+            "browsers": ["last 2 versions", "cover 99.9%"]
+          }
+        }]],
+      }),
+      uglify({
+        compress:{
+          pure_funcs: [
+            'console.log',
+            'debug.log',
+            'debug.array',
+            'debug.object',
+            'debug.skip',
+            'debug.string',
+            'debug.types'
+          ]
+        }
+      }),
+      insert.prepend(comment),
+      sourcemaps.write('.'),
+      rename({
+        suffix: ".min"
+      }),
+      gulp.dest('dist')
+    ], cb)
+})

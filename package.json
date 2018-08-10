@@ -1,15 +1,16 @@
 {
   "name": "ison",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "A better object notation with Date and custom types support",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/richinfante/ison.git"
   },
-  "main": "parser.js",
+  "main": "dist/ison.js",
   "scripts": {
-    "test": "tap tests/v3 && PARSER_FILE='../../dist/parser.js' tap tests/v3 && PARSER_FILE='../../dist/parser.min.js' tap tests/v3",
-    "build": "gulp"
+    "test": "tap tests/v3 && PARSER_FILE='../../dist/ison.js' tap tests/v3 && PARSER_FILE='../../dist/ison.min.js' tap tests/v3",
+    "build": "gulp",
+    "release": "gulp && npm test && npm publish"
   },
   "author": "rich@richinfante.com",
   "license": "MIT",
@@ -18,7 +19,9 @@
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
+    "babel-plugin-minify-mangle-names": "^0.4.3",
     "babel-preset-env": "^1.7.0",
+    "babel-preset-minify": "^0.4.3",
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.1",
     "gulp-insert": "^0.5.0",
@@ -26,6 +29,7 @@
     "gulp-sourcemaps": "^2.6.4",
     "gulp-strip-code": "^0.1.4",
     "gulp-uglify": "^3.0.1",
+    "pump": "^3.0.0",
     "tap": "^12.0.1"
   }
 }

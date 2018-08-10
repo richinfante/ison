@@ -12,7 +12,6 @@
  * For in-browser debugging, set DEBUG variable to true.
  */
 
-
 (function() {
 
   /* debug-block */
@@ -138,12 +137,14 @@
   const TOKEN_BLOCK_COMMENT_END = '*/'
 
 
-  class Parser {
-    constructor(string) {
-      this.cur = 0
-      this.string = string
-      this.stored = ''
-    }
+  /**
+   * Parse a string using the parser.
+   * @param  {ison string} string ison formatted string representing data.
+   * @throws {Error} If the data is incorrectly formatted.
+   * @return {Any}        the represented data
+   */
+  function parse(string) {
+    var cur = 0
 
     /**
      * Convert an identifier into a primitive value.
@@ -151,7 +152,7 @@
      * @return {Any}       the represented value
      * @throws {Error} If the value is not found.
      */
-    fromIdentifier(value) {
+    function fromIdentifier(value) {
 
       if (value == TOKEN_NULL) { 
         return null
@@ -173,25 +174,25 @@
         return false
       }
 
-      this.printError(`Unknown Identifier: "${value}"`)
+      printError(`Unknown Identifier: "${value}"`)
     }
 
     /**
      * Parse an identifier.
      * @return {[type]} an identifier string.
      */
-    parseIdentifier() {
-      this.skip(TOKEN_WS)
+    function parseIdentifier() {
+      skip(TOKEN_WS)
 
       let identifier = ''
 
-      if (this.is(TOKEN_IDENTIFIER_START)) {
-        while (this.is(TOKEN_IDENTIFIER)) {
-          identifier += this.current
-          this.next()
+      if (is(TOKEN_IDENTIFIER_START)) {
+        while (is(TOKEN_IDENTIFIER)) {
+          identifier += current()
+          next()
         }
       } else {
-        this.printError(`Unexpected token character ${this.current} (${this.current.charCodeAt(0)})`)
+        printFoundExpectedError(current(), TOKEN_IDENTIFIER_START)
       }
 
       return identifier
@@ -201,17 +202,17 @@
      * Parse an identifier. These should be valid JS object keys.
      * @return {number} The number that was parsed.
      */
-    parseNumber() {
-      this.skip(TOKEN_WS)
+    function parseNumber() {
+      skip(TOKEN_WS)
 
       let num = ''
-      if (this.is(TOKEN_NUMBER_START)) {
-        while (this.is(TOKEN_NUMBER)) {
-          num += this.current
-          this.next()
+      if (is(TOKEN_NUMBER_START)) {
+        while (is(TOKEN_NUMBER)) {
+          num += current()
+          next()
         }
       } else {
-        this.printError(`Unexpected token character ${this.current} (${this.current.charCodeAt(0)})`)
+        printFoundExpectedError(current(), TOKEN_NUMBER_START)
       } 
 
       if(num.indexOf('0x') == 0) {
@@ -229,36 +230,36 @@
      * Parse a string
      * @return {string} the string that was parsed.
      */
-    parseString() {
+    function parseString() {
       debug.string('Parsing String.')
-      if(!this.is(TOKEN_STRING_START)) {
-        this.printError('Invalid String start token')
+      if(!is(TOKEN_STRING_START)) {
+        printError('Invalid String start token')
       }
       
-      let start = this.current
-      this.skip(TOKEN_STRING_START, true, 1)
+      let start = current()
+      skip(TOKEN_STRING_START, true, 1)
       let out = ''
 
 
       debug.string(`Entered string with "${start}" (${start.charCodeAt(0)})`)
       
       while(true) {
-        debug.string(`Have "${this.current}" (${this.current.charCodeAt(0)})`)
-        if(this.is(TOKEN_ESCAPE)) {
-          out += this.next()
-          debug.string('Got escape for', this.current)
-        } else if(this.is(start)) {
+        debug.string(`Have "${current()}" (${current().charCodeAt(0)})`)
+        if(is(TOKEN_ESCAPE)) {
+          out += next()
+          debug.string('Got escape for', current())
+        } else if(is(start)) {
           debug.string('End of string')
           break
         } else {
-          out += this.current
-          debug.string('Append', this.current)
+          out += current()
+          debug.string('Append', current())
         }
 
-        this.next()
+        next()
       }
 
-      this.skip(TOKEN_STRING_START, true, 1)
+      skip(TOKEN_STRING_START, true, 1)
 
       debug.string(`output: "${out}"`)
       return out
@@ -268,33 +269,33 @@
      * Parse an argument list
      * @return {array} an array containing all the arguments.
      */
-    parseArguments() {
-      this.skip(TOKEN_LPAREN, true, 1)
-      this.skip(TOKEN_WS)
+    function parseArguments() {
+      skip(TOKEN_LPAREN, true, 1)
+      skip(TOKEN_WS)
 
       let array = []
-      while(!this.is(TOKEN_RPAREN)) {
+      while(!is(TOKEN_RPAREN)) {
 
-        this.skip(TOKEN_WS)
+        skip(TOKEN_WS)
 
-        let value = this.parseNext()
+        let value = parseNext()
 
         array.push(value)
 
-        this.skip(TOKEN_WS)
+        skip(TOKEN_WS)
 
         // Comma or RBRACE are exit conditions.
-        if (this.is(TOKEN_COMMA)) {
-          this.skip(TOKEN_COMMA, true, 1)
-        } else if (this.is(TOKEN_RPAREN)) {
+        if (is(TOKEN_COMMA)) {
+          skip(TOKEN_COMMA, true, 1)
+        } else if (is(TOKEN_RPAREN)) {
           break
         } else {
-          this.printError(`Unexpected token, "${this.current}" (${this.current.charCodeAt(0)}) looking for COMMA or RBRACKET.`)
+          printFoundExpectedError(current(), '," or ")')
         }
       }
 
-      this.skip(TOKEN_WS)
-      this.skip(TOKEN_RPAREN, true, 1)
+      skip(TOKEN_WS)
+      skip(TOKEN_RPAREN, true, 1)
 
       return array
     }
@@ -303,33 +304,33 @@
      * Parse an array.
      * @return {array} returns array items
      */
-    parseArray() {
-      this.skip(TOKEN_LBRACKET, true, 1)
-      this.skip(TOKEN_WS)
+    function parseArray() {
+      skip(TOKEN_LBRACKET, true, 1)
+      skip(TOKEN_WS)
 
       let array = []
-      while(!this.is(TOKEN_RBRACKET)) {
+      while(!is(TOKEN_RBRACKET)) {
 
-        this.skip(TOKEN_WS)
+        skip(TOKEN_WS)
 
-        let value = this.parseNext()
+        let value = parseNext()
 
         array.push(value)
 
-        this.skip(TOKEN_WS)
+        skip(TOKEN_WS)
 
         // Comma or RBRACE are exit conditions.
-        if (this.is(TOKEN_COMMA)) {
-          this.skip(TOKEN_COMMA, true, 1)
-        } else if (this.is(TOKEN_RBRACKET)) {
+        if (is(TOKEN_COMMA)) {
+          skip(TOKEN_COMMA, true, 1)
+        } else if (is(TOKEN_RBRACKET)) {
           break
         } else {
-          this.printError(`Unexpected token, "${this.current}" (${this.current.charCodeAt(0)}) looking for COMMA or RBRACKET.`)
+          printFoundExpectedError(current(), '," or "]')
         }
       }
 
-      this.skip(TOKEN_WS)
-      this.skip(TOKEN_RBRACKET, true, 1)
+      skip(TOKEN_WS)
+      skip(TOKEN_RBRACKET, true, 1)
 
       return array
     }
@@ -338,40 +339,40 @@
      * Parse an object notation block.
      * @return {object} The represented object.
      */
-    parseObject() {
+    function parseObject() {
 
       debug.object('entering object.')
 
-      this.skip(TOKEN_LBRACE, true, 1)
-      this.skip(TOKEN_WS)
+      skip(TOKEN_LBRACE, true, 1)
+      skip(TOKEN_WS)
 
       let object = {}
 
-      while(!this.is(TOKEN_RBRACE)) {
+      while(!is(TOKEN_RBRACE)) {
         let key = null
 
-        this.skip(TOKEN_WS)
+        skip(TOKEN_WS)
 
         debug.object('parsing key')
 
         // Allowing quoted keys, use quote opt. to figure out which.
-        if (this.is(TOKEN_STRING_START)) {
-          key = this.parseString()
-        } else if (this.is(TOKEN_NUMBER_START)) {
-          key = this.parseNumber()
+        if (is(TOKEN_STRING_START)) {
+          key = parseString()
+        } else if (is(TOKEN_NUMBER_START)) {
+          key = parseNumber()
         } else {
-          key = this.parseIdentifier()
+          key = parseIdentifier()
         }
 
         // Skip separator and WS
-        this.skip(TOKEN_WS)
-        this.skip(TOKEN_COLON, true, 1)
-        this.skip(TOKEN_WS)
+        skip(TOKEN_WS)
+        skip(TOKEN_COLON, true, 1)
+        skip(TOKEN_WS)
 
         debug.object('got key', key)
 
         // Value can be anything, go next.
-        let value = this.parseNext()
+        let value = parseNext()
 
         debug.object('got value', value)
 
@@ -379,19 +380,19 @@
         object[key] = value
 
 
-        this.skip(TOKEN_WS)
+        skip(TOKEN_WS)
 
         // Comma or RBRACE are exit conditions.
-        if (this.is(TOKEN_COMMA)) {
-          this.skip(TOKEN_COMMA, true, 1)
-        } else if (this.is(TOKEN_RBRACE)) {
+        if (is(TOKEN_COMMA)) {
+          skip(TOKEN_COMMA, true, 1)
+        } else if (is(TOKEN_RBRACE)) {
           break
         } else {
-          this.printError(`Unexpected token "${this.current}" (${this.current.charCodeAt(0)}), looking for COMMA or RBRACE.`)
+          printFoundExpectedError(current(), '," or "}')
         }
       }
 
-      this.skip(TOKEN_RBRACE, true, 1)
+      skip(TOKEN_RBRACE, true, 1);
 
       return object
     }
@@ -401,43 +402,45 @@
      * This is used to parse a value of any type 
      * @return {any} The value
      */
-    parseNext() {
+    function parseNext() {
       debug.log('parse next!')
-      this.skip(TOKEN_WS)
+      skip(TOKEN_WS)
 
-      if (this.is(TOKEN_LBRACE)) {
-        return this.parseObject()
-      } else if (this.is(TOKEN_LBRACKET)) {
-        return this.parseArray()
-      } else if (this.is(TOKEN_LPAREN)) {
-        return this.parseArguments()
-      } else if (this.is(TOKEN_NUMBER_START)) {
-        return this.parseNumber()
-      } else if (this.is(TOKEN_STRING_START)) {
-        return this.parseString()
-      } else if (this.is(TOKEN_IDENTIFIER_START)){
-        let identifier = this.parseIdentifier()
-        if(this.is(TOKEN_LPAREN)) {
-          let args = this.parseArguments()
+      if (is(TOKEN_LBRACE)) {
+        return parseObject()
+      } else if (is(TOKEN_LBRACKET)) {
+        return parseArray()
+      } else if (is(TOKEN_LPAREN)) {
+        return parseArguments()
+      } else if (is(TOKEN_NUMBER_START)) {
+        return parseNumber()
+      } else if (is(TOKEN_STRING_START)) {
+        return parseString()
+      } else if (is(TOKEN_IDENTIFIER_START)){
+        let identifier = parseIdentifier()
+        if(is(TOKEN_LPAREN)) {
+          let args = parseArguments()
           return newInstance(identifier, args)
         } else {
-          return this.fromIdentifier(identifier)
+          return fromIdentifier(identifier)
         }
       } else {
-        this.printError(`Unexpected token "${this.current}" (${this.current.charCodeAt(0)})`)
+        printFoundExpectedError(current())
       }
     }
+
+    this.parseNext = parseNext
 
     /**
      * Check if the current character is a token
      * @param  {RegExp|string}  token a token description
      * @return {Boolean}       does it match the current?
      */
-    is(token) {
+    function is(token) {
       if(token instanceof RegExp) {
-        return token.test(this.current)
+        return token.test(current())
       } else {
-        return this.current == token
+        return current() == token
       }
     }
 
@@ -445,8 +448,8 @@
      * Get the character under the cursor
      * @return {string} the character
      */
-    get current() {
-      return this.string[this.cur]
+    function current() {
+      return string[cur]
     }
 
     /**
@@ -454,20 +457,20 @@
      * @throws {Error} If we need a next character and we found EOF.
      * @return {string} the next character
      */
-    next () {
-      this.cur += 1
-      if (this.cur > this.string.length) {
-        this.printError('Unexpected EOF!')
+    function next () {
+      cur += 1
+      if (cur > string.length) {
+        printError('Unexpected EOF!')
       }
-      return this.current
+      return current()
     }
 
     /**
      * Returns the next character in the input string.
      * @return {string} next input character
      */
-    peek() {
-      return this.string[this.cur + 1]
+    function peek() {
+      return string[cur + 1]
     }
 
 
@@ -475,10 +478,10 @@
      * Seek forward in the input for a specific token
      * @param  {RegExp|string} token token to find.
      */
-    seek (token) {
-      while(!this.is(token)) {
-        this.next()
-        debug.skip('(seek) skipping', this.current)
+    function seek (token) {
+      while(!is(token)) {
+        next()
+        debug.skip('(seek) skipping', current())
       }
     }
 
@@ -488,22 +491,22 @@
      * @param  {Boolean} strict should we fail if this cannot be found?
      * @param  {Number}  count  skip a certain amount of tokens.
      */
-    skip(token, strict=false, count=Infinity) {
+    function skip(token, strict=false, count=Infinity) {
       debug.skip('skipping', token)
-      let old = this.cur
+      let old = cur
 
       // If we're in strict mode, fail immediately.
-      if (strict && !this.is(token)) {
-        this.printError(`expected token "${token}" got "${this.current}"!`)
+      if (strict && !is(token)) {
+        printFoundExpectedError(current(), token)
       }
 
       // While it matches, continue.
-      while(this.is(token) && count > 0) {
-        this.cur += 1
+      while(is(token) && count > 0) {
+        cur += 1
         count -= 1
       }
 
-      debug.skip('skipped ahead', this.cur - old)
+      debug.skip('skipped ahead', cur - old)
 
       // If we're skipping whitespace, 
       // Perform a skip for comments as well, if the token matches.
@@ -511,38 +514,42 @@
         debug.skip('check comment seek')
 
         // If we're on a line comment
-        if (this.current + this.peek() == TOKEN_LINE_COMMENT) {
+        if (current() + peek() == TOKEN_LINE_COMMENT) {
           // Seek past it
-          this.seek(TOKEN_NEWLINE)
+          seek(TOKEN_NEWLINE)
         }
 
         // If we're on a block comment
-        if (this.current + this.peek() == TOKEN_BLOCK_COMMENT_START) {
+        if (current() + peek() == TOKEN_BLOCK_COMMENT_START) {
           
           while(true) {
             // Seek to the next '*'  
-            this.seek('*')
+            seek('*')
 
             // If it makes up a comment end, break.
-            if (this.current + this.peek() == TOKEN_BLOCK_COMMENT_END) {
+            if (current() + peek() == TOKEN_BLOCK_COMMENT_END) {
               break
             } else {
               // Otherwise, continue.
-              this.next()
+              next()
             }
           }
 
           // Skip past the end comment.
-          this.next()
-          this.next()
+          next()
+          next()
         }
 
         // If it's still whitespace, skip.
         // TOKEN_WS can only handle one comment at a time.
-        if (this.is(TOKEN_WS)) {
-          this.skip(TOKEN_WS)
+        if (is(TOKEN_WS)) {
+          skip(TOKEN_WS)
         }
       }
+    }
+
+    function printFoundExpectedError(found, expected) {
+      printError(`Unexpected Token. found: "${found}" (${found.charCodeAt(0)}), expected: "${expected}"`)
     }
 
     /**
@@ -551,26 +558,28 @@
      * @throws {Error} If true
      * @param  {String} error error description
      */
-    printError(error='Unknown Error') {
-      let current = this.cur
+    function printError(error='Unknown Error') {
+      let current = cur
       let l_bound = current - 10
       if(l_bound < 0) {
         l_bound = 0
       }
 
       let u_bound = current + 10
-      if (u_bound >= this.string.length) {
-        u_bound = this.string.length - 1
+      if (u_bound >= string.length) {
+        u_bound = string.length - 1
       }
 
       let count = current - l_bound
 
       throw new Error(`Could not parse input.
-${this.string.substring(l_bound, u_bound).replace(/\n/g, ' ')}
+${string.substring(l_bound, u_bound).replace(/\n/g, ' ')}
 ${'^'.padStart(count + 1)}
 ${error}
-at input: ${this.cur}`)
+at input: ${cur}`)
     }
+
+    return parseNext()
   }
 
   /**
@@ -640,20 +649,7 @@ at input: ${this.cur}`)
     }
   }
 
-  /**
-   * Parse a string using the parser.
-   * @param  {ison string} string ison formatted string representing data.
-   * @throws {Error} If the data is incorrectly formatted.
-   * @return {Any}        the represented data
-   */
-  function parse(string) {
-    let p = new Parser(string)
-    let result = p.parseNext()
-    return result
-  }
-
   // Module shim.
-  // Export depending on environment
   var exported_funcs = { parse, stringify }
 
   if(typeof module != "undefined") {
