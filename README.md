@@ -19,6 +19,7 @@ A better object notation with Date and custom types support, Comments, and _JSON
   - [x] Oct representation (`0o134717`)
   - [x] Bin representation (`0b101011`)
   - [x] Dec representation (`-1000`, `1000.324`)
+  - [x] Exp representation (`2.99e8`)
 - [x] Boolean (and primitives)
 - [x] Array (and literals)
 - [x] Object (and literals)
