@@ -637,7 +637,9 @@ at input: ${cur}`)
    * @return {string}        string representation
    */
   function stringify(object) {
-    if (object instanceof Date) {
+    if(object === null || object === undefined) {
+      return 'null'
+    } else if (object instanceof Date) {
       // Serialize dates
       return `Date(${object.getTime()})`
     } else if (typeof object == 'string' || object instanceof String) {
