@@ -659,7 +659,7 @@ at input: ${cur}`)
     } else if (typeof object == 'boolean') {
       return `${object}`
     } else if (object instanceof Object) {
-      let name = object['$type'] || object.constructor.name
+      let name = object.className || object['$type'] || object.constructor.name
 
       delete object['$type']
 

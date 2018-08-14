@@ -106,7 +106,9 @@ Array( 1, 2, 3 ) === [ 1, 2, 3 ]
 ```
 
 ## Custom Types
-ISON now includes a custom types interface. This takes advantage of destructuring, but also allows for you to rename the types as they are exposed to the ISON parser. For completeness, it is recommended you provide a `destructor()` for your custom types.
+ISON now includes a custom types interface. This takes advantage of destructuring, but also allows for you to rename the types as they are exposed to the ISON parser. For completeness, it is recommended you provide a `destructor()` function for your custom types.
+
+In cases where you need to override the detected type name of an object, you may use the `className` property. In most cases, this is __not necessary and you shouldn't use this**.
 
 ```js
 const ison = require('./ison')

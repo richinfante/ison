@@ -1,5 +1,5 @@
 /*!
- * ISON v0.0.13
+ * ISON v0.0.14
  * (c) 2018 Rich Infante
  * Released under the MIT License.
  */
@@ -589,7 +589,7 @@ at input: ${cur}`)
     } else if (typeof object == 'boolean') {
       return `${object}`
     } else if (object instanceof Object) {
-      let name = object['$type'] || object.constructor.name
+      let name = object.className || object['$type'] || object.constructor.name
 
       delete object['$type']
 
