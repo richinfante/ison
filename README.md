@@ -194,7 +194,7 @@ ison.parse('Point(234,345,6778)') // Returns a new point instance with x,y,z.
   - Not necessarily. Often, it's actually smaller. This is due to the fact that most JSON typing is often done using a field named `type` and then attaching all of the other data to it as well.
   - Also, the requirement for most dictionary keys to be quoted has been dropped, removing much more wasted space.
 - How much space does ISON use?
-  - the minified version is only ~4.7kb
+  - the minified version is only about ~5.5kb
   - the production versions of ISON in the `dist/` folder have no dependencies (other than standard JavaScript).
 
 ## Notes

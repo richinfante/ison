@@ -41,6 +41,17 @@ gulp.task('default', (cb) => {
       uglify({
         compress: true
       }),
+
+      // Hand-written minify ops
+      
+      // Replace long symbols:
+      replace(/_toConsumableArray/g, '_c'),
+      replace(/_slicedToArray/g, '_s'),
+      
+      // Replace undefined with a constant variable (_u)
+      replace(`"undefined"`, `_u`),
+      replace(`"use strict";`, `"use strict";var _u = "undefined";`),
+
       insert.prepend(comment),
       sourcemaps.write('.'),
       rename({

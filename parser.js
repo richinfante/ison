@@ -44,6 +44,35 @@
 
   /* end-debug-block */
   
+
+  // Tokens
+  const TOKEN_INFINITY = 'Infinity'
+  const TOKEN_NAN      = 'NaN'
+  const TOKEN_TRUE     = 'true'
+  const TOKEN_FALSE    = 'false'
+  const TOKEN_NULL     = 'null'
+  const TOKEN_LBRACE   = '{'
+  const TOKEN_RBRACE   = '}'
+  const TOKEN_LBRACKET = '['
+  const TOKEN_RBRACKET = ']'
+  const TOKEN_LPAREN   = '('
+  const TOKEN_RPAREN   = ')'
+  const TOKEN_SQUOTE   = `'`
+  const TOKEN_DQUOTE   = `"`
+  const TOKEN_COMMA    = `,`
+  const TOKEN_COLON    = /[:=]/
+  const TOKEN_WS       = /[ \n\t]/
+  const TOKEN_STRING_START = /["']/
+  const TOKEN_IDENTIFIER = /[a-z0-9_\.]/i
+  const TOKEN_IDENTIFIER_START = /[a-z_]/i
+  const TOKEN_NUMBER_START = /[+0-9\-]/
+  const TOKEN_NUMBER = /[0-9xbo\.+\-a-f]/i
+  const TOKEN_ESCAPE = '\\'
+  const TOKEN_NEWLINE = '\n'
+  const TOKEN_LINE_COMMENT = '//'
+  const TOKEN_BLOCK_COMMENT_START = '/*'
+  const TOKEN_BLOCK_COMMENT_END = '*/'
+
   // Type constructors
   // Called with "new" to create an instance
   const types = {
@@ -100,6 +129,14 @@
     debug.types('types are now', types)
   }
 
+  addConstants({
+    'null': null,
+    'Infinity': Infinity,
+    'true': true,
+    'false': false,
+    'NaN': NaN
+  })
+
   /**
    * Remove types from the ISON parser.
    * It will remove them from the type index.
@@ -115,6 +152,34 @@
     debug.types('types are now', types)
   }
 
+    /**
+   * Add types to the ISON parser.
+   * It will instantiate using them
+   * @param {object} object dictionary of object names and constructors.
+   */
+  function addConstants(object) {
+    debug.types('adding', object)
+    for(let i in object) {
+      funcs[i] = object[i]
+    }
+    debug.types('funcs are now', funcs)
+  }
+
+  /**
+   * Remove types from the ISON parser.
+   * It will remove them from the type index.
+   * @param {object} object dictionary of object names and constructors to remove..
+   */
+  function removeConstants(object) {
+    debug.types('removing', object)
+    for (let i in object) {
+      if(funcs[i] === object[i]) {
+        delete funcs[i]
+      }
+    }
+    debug.types('funcs are now', funcs)
+  }
+
   function newInstance(name, args) {
     debug.types('newInstance', name, args)
 
@@ -125,7 +190,7 @@
     }
     
     // Create a new instance using functions
-    if (funcs[name]) {
+    if (funcs[name] && typeof funcs[name] == 'function') {
       debug.types('found function for name', name, 'calling with args', args)
       return funcs[name](...args)
     }
@@ -137,38 +202,8 @@
      } else {
         debug.types('no type found, returning args[]')
         return args
-     }
-    
+     } 
   }
-
-  // Tokens
-  const TOKEN_INFINITY = 'Infinity'
-  const TOKEN_NAN      = 'NaN'
-  const TOKEN_TRUE     = 'true'
-  const TOKEN_FALSE    = 'false'
-  const TOKEN_NULL     = 'null'
-  const TOKEN_LBRACE   = '{'
-  const TOKEN_RBRACE   = '}'
-  const TOKEN_LBRACKET = '['
-  const TOKEN_RBRACKET = ']'
-  const TOKEN_LPAREN   = '('
-  const TOKEN_RPAREN   = ')'
-  const TOKEN_SQUOTE   = `'`
-  const TOKEN_DQUOTE   = `"`
-  const TOKEN_COMMA    = `,`
-  const TOKEN_COLON    = /[:=]/
-  const TOKEN_WS       = /[ \n\t]/
-  const TOKEN_STRING_START = /["']/
-  const TOKEN_IDENTIFIER = /[a-z0-9_]/i
-  const TOKEN_IDENTIFIER_START = /[a-z_]/i
-  const TOKEN_NUMBER_START = /[+0-9\-]/
-  const TOKEN_NUMBER = /[0-9xbo\.+\-a-f]/i
-  const TOKEN_ESCAPE = '\\'
-  const TOKEN_NEWLINE = '\n'
-  const TOKEN_LINE_COMMENT = '//'
-  const TOKEN_BLOCK_COMMENT_START = '/*'
-  const TOKEN_BLOCK_COMMENT_END = '*/'
-
 
   /**
    * Parse a string using the parser.
@@ -186,25 +221,10 @@
      * @throws {Error} If the value is not found.
      */
     function fromIdentifier(value) {
+      debug.log(`translate "${value}" to constant`)
 
-      if (value == TOKEN_NULL) { 
-        return null
-      }
-
-      if (value == TOKEN_INFINITY) { 
-        return Infinity
-      }
-
-      if (value == TOKEN_NAN) { 
-        return NaN
-      }
-
-      if (value == TOKEN_TRUE) { 
-        return true
-      }
-
-      if (value == TOKEN_FALSE) { 
-        return false
+      if (funcs[value] !== undefined) {
+        return funcs[value]
       }
 
       printError(`Unknown Identifier: "${value}"`)
@@ -215,6 +235,7 @@
      * @return {[type]} an identifier string.
      */
     function parseIdentifier() {
+      debug.log('parse identifier')
       skip(TOKEN_WS)
 
       let identifier = ''
@@ -222,7 +243,8 @@
       if (is(TOKEN_IDENTIFIER_START)) {
         while (is(TOKEN_IDENTIFIER)) {
           identifier += current()
-          next()
+          next(false)
+          debug.log('parse identifer', current())
         }
       } else {
         printFoundExpectedError(current(), TOKEN_IDENTIFIER_START)
@@ -236,6 +258,7 @@
      * @return {number} The number that was parsed.
      */
     function parseNumber() {
+      debug.log('parse number')
       skip(TOKEN_WS)
 
       let num = ''
@@ -244,6 +267,12 @@
           num += current()
           next()
         }
+
+        if(num == '-' || num == '+' && is(TOKEN_IDENTIFIER_START)) {
+          debug.log('found identifier after numer sign.')
+          return (num == '-' ? -1 : 1) * parseIdentifier()
+        }
+
       } else {
         printFoundExpectedError(current(), TOKEN_NUMBER_START)
       } 
@@ -303,6 +332,7 @@
      * @return {array} an array containing all the arguments.
      */
     function parseArguments() {
+      debug.log('parse args')
       skip(TOKEN_LPAREN, true, 1)
       skip(TOKEN_WS)
 
@@ -338,6 +368,7 @@
      * @return {array} returns array items
      */
     function parseArray() {
+      debug.log('parse array')
       skip(TOKEN_LBRACKET, true, 1)
       skip(TOKEN_WS)
 
@@ -436,7 +467,7 @@
      * @return {any} The value
      */
     function parseNext() {
-      debug.log('parse next!')
+      debug.log('parse next!', current())
       skip(TOKEN_WS)
 
       if (is(TOKEN_LBRACE)) {
@@ -470,7 +501,10 @@
      * @return {Boolean}       does it match the current?
      */
     function is(token) {
-      if(token instanceof RegExp) {
+      debug.log(`check ${current()} is ${token}`)
+      if (current() == undefined) {
+        return false
+      } else if(token instanceof RegExp) {
         return token.test(current())
       } else {
         return current() == token
@@ -490,9 +524,9 @@
      * @throws {Error} If we need a next character and we found EOF.
      * @return {string} the next character
      */
-    function next () {
+    function next (strict=true) {
       cur += 1
-      if (cur > string.length) {
+      if (strict && cur > string.length) {
         printError('Unexpected EOF!')
       }
       return current()
@@ -512,7 +546,7 @@
      * @param  {RegExp|string} token token to find.
      */
     function seek (token) {
-      while(!is(token)) {
+      while(!is(token) && current() != undefined) {
         next()
         debug.skip('(seek) skipping', current())
       }
@@ -534,7 +568,7 @@
       }
 
       // While it matches, continue.
-      while(is(token) && count > 0) {
+      while (is(token) && count > 0) {
         cur += 1
         count -= 1
       }
@@ -555,7 +589,8 @@
         // If we're on a block comment
         if (current() + peek() == TOKEN_BLOCK_COMMENT_START) {
           
-          while(true) {
+          while(true && current != undefined) {
+            debug.skip('loop', current())
             // Seek to the next '*'  
             seek('*')
 
@@ -578,6 +613,8 @@
         if (is(TOKEN_WS)) {
           skip(TOKEN_WS)
         }
+
+        debug.skip('check comment seek done.')
       }
     }
 
@@ -688,13 +725,19 @@ at input: ${cur}`)
       // Number
       return `${object}`
     } else {
+      for (let [key, value] of Object.entries(funcs)) {
+        if (value === object) {
+          return key
+        }
+      }
+      
       console.log(object, typeof object)
       throw new Error('Stringify Error!')
     }
   }
 
   // Module shim.
-  var exported_funcs = { parse, stringify, addTypes, removeTypes }
+  var exported_funcs = { parse, stringify, addTypes, removeTypes, addConstants, removeConstants }
 
   if(typeof module != "undefined") {
     module.exports = exported_funcs
