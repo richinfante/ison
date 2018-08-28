@@ -1,5 +1,5 @@
 /*!
- * ISON v0.0.15
+ * ISON v0.0.16
  * (c) 2018 Rich Infante
  * Released under the MIT License.
  */
@@ -135,26 +135,6 @@
     }
   }
 
-  function newInstance(name, args) {
-
-    // Create a new instance using a constructor
-    if (types[name]) {
-      return new types[name](...args)
-    }
-    
-    // Create a new instance using functions
-    if (funcs[name] && typeof funcs[name] == 'function') {
-      return funcs[name](...args)
-    }
-    
-    
-    if (args.length == 1) {
-        return args[0]
-     } else {
-        return args
-     } 
-  }
-
   /**
    * Parse a string using the parser.
    * @param  {ison string} string ison formatted string representing data.
@@ -163,6 +143,22 @@
    */
   function parse(string) {
     var cur = 0
+
+
+    function newInstance(name, args) {
+
+      // Create a new instance using a constructor
+      if (types[name]) {
+        return new types[name](...args)
+      }
+      
+      // Create a new instance using functions
+      if (funcs[name] && typeof funcs[name] == 'function') {
+        return funcs[name](...args)
+      }
+      
+      printError(`Unknown type name: "${name}".`)
+    }
 
     /**
      * Convert an identifier into a primitive value.
@@ -248,7 +244,12 @@
       
       while(true) {
         if(is(TOKEN_ESCAPE)) {
-          out += next()
+          let nextChar = next()
+          if (nextChar == 'n') {
+            out += '\n'
+          } else {
+            out += nextChar
+          }
         } else if(is(start)) {
           break
         } else {

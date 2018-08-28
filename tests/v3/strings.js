@@ -15,7 +15,7 @@ tap.test('strings', function (childTest) {
     a: "abc'd", 
     b: "a,b,c",
     c: `"'a'`,
-    d: `a'bcdef`
+    d: `a'bcde\nf`
   })
   
   childTest.strictSame(input, output)

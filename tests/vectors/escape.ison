@@ -2,5 +2,5 @@
   a: "abc'd", 
   b: "a,b,c",
   c: "\"'a'",
-  d: 'a\'bcdef'
+  d: 'a\'bcde\nf'
 }

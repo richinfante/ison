@@ -180,31 +180,6 @@
     debug.types('funcs are now', funcs)
   }
 
-  function newInstance(name, args) {
-    debug.types('newInstance', name, args)
-
-    // Create a new instance using a constructor
-    if (types[name]) {
-      debug.types('found class for name', name, 'instantiating with args', args)
-      return new types[name](...args)
-    }
-    
-    // Create a new instance using functions
-    if (funcs[name] && typeof funcs[name] == 'function') {
-      debug.types('found function for name', name, 'calling with args', args)
-      return funcs[name](...args)
-    }
-    
-    
-    if (args.length == 1) {
-        debug.types('no type found, returning args[0]')
-        return args[0]
-     } else {
-        debug.types('no type found, returning args[]')
-        return args
-     } 
-  }
-
   /**
    * Parse a string using the parser.
    * @param  {ison string} string ison formatted string representing data.
@@ -213,6 +188,25 @@
    */
   function parse(string) {
     var cur = 0
+
+
+    function newInstance(name, args) {
+      debug.types('newInstance', name, args)
+
+      // Create a new instance using a constructor
+      if (types[name]) {
+        debug.types('found class for name', name, 'instantiating with args', args)
+        return new types[name](...args)
+      }
+      
+      // Create a new instance using functions
+      if (funcs[name] && typeof funcs[name] == 'function') {
+        debug.types('found function for name', name, 'calling with args', args)
+        return funcs[name](...args)
+      }
+      
+      printError(`Unknown type name: "${name}".`)
+    }
 
     /**
      * Convert an identifier into a primitive value.
@@ -308,7 +302,12 @@
       while(true) {
         debug.string(`Have "${current()}" (${current().charCodeAt(0)})`)
         if(is(TOKEN_ESCAPE)) {
-          out += next()
+          let nextChar = next()
+          if (nextChar == 'n') {
+            out += '\n'
+          } else {
+            out += nextChar
+          }
           debug.string('Got escape for', current())
         } else if(is(start)) {
           debug.string('End of string')

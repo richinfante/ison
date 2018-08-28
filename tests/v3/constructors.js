@@ -57,3 +57,9 @@ tap.test('object destructor', function (childTest) {
   
   childTest.end()
 })
+
+
+tap.test('parse unknown', function (childTest) {
+  childTest.throws(() => ison.parse('ABC()'), {}, 'unknown type should throw.')
+  childTest.end()
+})
