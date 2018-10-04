@@ -14,6 +14,6 @@ tap.test('constants', function (childTest) {
 
   childTest.strictSame(input.func, Math.random, 'correct function should be resurrected')
   childTest.strictSame(input.num, 1337, 'correct number should be resurrected')
-
+  // childTest.strictSame(ison.stringify(Math.random), 'RANDOM_FLOAT', 'should serialize using name')
   childTest.end()
 })

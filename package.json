@@ -1,6 +1,6 @@
 {
   "name": "ison",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "A better object notation with Date and custom types support",
   "repository": {
     "type": "git",

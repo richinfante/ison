@@ -1,5 +1,5 @@
 /*!
- * ISON v0.0.16
+ * ISON v0.0.17
  * (c) 2018 Rich Infante
  * Released under the MIT License.
  */
@@ -30,6 +30,7 @@
   const TOKEN_IDENTIFIER_START = /[a-z_]/i
   const TOKEN_NUMBER_START = /[+0-9\-]/
   const TOKEN_NUMBER = /[0-9xbo\.+\-a-f]/i
+  const TOKEN_UNITS = /[a-z/0-9_\^]/i
   const TOKEN_ESCAPE = '\\'
   const TOKEN_NEWLINE = '\n'
   const TOKEN_LINE_COMMENT = '//'
@@ -196,6 +197,16 @@
       return identifier
     }
 
+    function parseUnits() {
+      let units = ''
+      while(is(TOKEN_UNITS)) {
+        units += current()
+        next()
+      }
+
+      return units
+    }
+
     /**
      * Parse an identifier. These should be valid JS object keys.
      * @return {number} The number that was parsed.
@@ -224,6 +235,15 @@
         return parseInt(num.substr(2), 2)
       } else if(num.indexOf('0o') == 0) {
         return parseInt(num.substr(2), 8)
+      }
+
+      skip(TOKEN_WS)
+
+      if (is(TOKEN_UNITS)) {
+        let units = parseUnits()
+        let number = new Number(parseFloat(num))
+        number.units = units
+        return number
       }
 
       return parseFloat(num)
@@ -590,7 +610,9 @@ at input: ${cur}`)
    * @return {string}        string representation
    */
   function stringify(object) {
-    if(object === null || object === undefined) {
+    if (object instanceof Number && object.units) {
+      return `${object} ${object.units}`
+    } else if(object === null || object === undefined) {
       return 'null'
     } else if (object instanceof Date) {
       // Serialize dates
