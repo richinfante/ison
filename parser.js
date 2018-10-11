@@ -63,11 +63,11 @@
   const TOKEN_COLON    = /[:=]/
   const TOKEN_WS       = /[ \n\t]/
   const TOKEN_STRING_START = /["']/
-  const TOKEN_IDENTIFIER = /[a-z0-9_\.]/i
-  const TOKEN_IDENTIFIER_START = /[a-z_]/i
+  const TOKEN_IDENTIFIER = /[\$@~a-z0-9_\.]/i
+  const TOKEN_IDENTIFIER_START = /[\$@~a-z_]/i
   const TOKEN_NUMBER_START = /[+0-9\-]/
   const TOKEN_NUMBER = /[0-9xbo\.+\-a-f]/i
-  const TOKEN_UNITS = /[a-z/0-9_\^]/i
+  const TOKEN_UNITS = /[%μa-z/0-9_\^]/i
   const TOKEN_ESCAPE = '\\'
   const TOKEN_NEWLINE = '\n'
   const TOKEN_LINE_COMMENT = '//'

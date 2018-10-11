@@ -20,3 +20,27 @@ tap.test('Units', function (childTest) {
   childTest.strictSame(looped.g.units, 'm/s^2', 'looped check units')
   childTest.end()
 })
+
+
+tap.test('Units (with μ)', function (childTest) {
+  let input = ison.parse(`{ capacitance: 35 μF }`)
+  childTest.strictSame(input.capacitance + 0, 35, 'Check that both are numbers')
+  childTest.strictSame(input.capacitance.units, 'μF', 'Check units')
+  let looped = ison.parse(ison.stringify(input))
+  childTest.strictSame(looped.capacitance + 0, 35, 'looped check that both are numbers')
+  childTest.strictSame(looped.capacitance.units, 'μF', 'looped check units')
+  childTest.end()
+})
+
+
+
+tap.test('Units (with %)', function (childTest) {
+  let input = ison.parse(`{ uptime: 99.999 % }`)
+  childTest.strictSame(input.uptime + 0, 99.999, 'Check that both are numbers')
+  childTest.strictSame(input.uptime.units, '%', 'Check units')
+  let looped = ison.parse(ison.stringify(input))
+  childTest.strictSame(looped.uptime + 0, 99.999, 'looped check that both are numbers')
+  childTest.strictSame(looped.uptime.units, '%', 'looped check units')
+  childTest.end()
+})
+
